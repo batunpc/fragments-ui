@@ -4,7 +4,6 @@
   "description": "Fragments UI testing web app",
   "scripts": {
     "start": "(npx parcel ./public/index.html) && (npx parcel watch ./public/index.html)",
-    "dev": "tsc-watch --onSuccess \"node dist/index.js\"",
     "build": "tsc",
     "postinstall": "npm run build"
   },
