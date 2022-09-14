@@ -19,7 +19,8 @@
   },
   "license": "UNLICENSED",
   "dependencies": {
-    "aws-amplify": "^4.3.35"
+    "aws-amplify": "^4.3.35",
+    "dotenv": "^16.0.2"
   },
   "devDependencies": {
     "parcel": "^2.7.0",
