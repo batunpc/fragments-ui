@@ -13,12 +13,10 @@ export async function getUserFragments(user: any) {
 			// Generate headers with the proper Authorization bearer token to pass
 			headers: user.authorizationHeaders()
 		});
-		if (!res.ok) {
-			throw new Error(`${res.status} ${res.statusText}`);
-		}
+		if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 		const data = await res.json();
 		console.log('Got user fragments data', { data });
-	} catch (err) {
-		console.error('Unable to call GET /v1/fragment', { err });
+	} catch (err: any) {
+		console.error('Unable to call GET /v1/fragment', { err: err.message });
 	}
 }

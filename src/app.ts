@@ -6,7 +6,8 @@ async function init() {
 	const userSection = document.querySelector('#user');
 	const loginBtn = document.querySelector('#login');
 	const logoutBtn = document.querySelector('#logout');
-
+	// See if we're signed in (i.e., we'll have a `user` object)
+	const user = await getUser();
 	// Wire up event handlers to deal with login and logout.
 	loginBtn
 		? loginBtn.addEventListener('click', () => Auth.federatedSignIn())
@@ -16,10 +17,6 @@ async function init() {
 		? logoutBtn.addEventListener('click', () => Auth.signOut())
 		: null;
 
-	// See if we're signed in (i.e., we'll have a `user` object)
-	const user = await getUser();
-	// Do an authenticated request to the fragments API server and log the result
-	getUserFragments(user);
 	if (!user) {
 		// Disable the Logout button
 		logoutBtn?.setAttribute('disabled', 'true');
@@ -36,6 +33,9 @@ async function init() {
 		?.querySelector('.username')
 		?.appendChild(document.createTextNode(user.username));
 	loginBtn?.classList.add('hidden');
+
+	// Do an authenticated request to the fragments API server and log the result
+	getUserFragments(user); // api call
 }
 
 // Wait for the DOM to be ready, then start the app
