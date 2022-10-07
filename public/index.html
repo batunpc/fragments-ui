@@ -1,33 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<title>Fragments UI</title>
-		<link rel="stylesheet" href="https://unpkg.com/bamboo.css" />
-		<script type="module" src="../src/app.ts"></script>
-	</head>
-  <body>
-  <style>
-    /* border */
-    .container {
-      border: 2px solid #ccc;
-      padding: 2rem;
-      border-radius: .5rem;
-      border-color: #292E39
-    }
-  </style>
+
+<head>
+	<meta charset="utf-8" />
+	<title>Fragments UI</title>
+	<link rel="stylesheet" href="https://unpkg.com/bamboo.css" />
+	<script type="module" src="../src/app.ts"></script>
+</head>
+
+<body>
+	<style>
+		/* border */
+		.container {
+			border: 4px solid #292E39;
+			padding: 3rem;
+			border-radius: .5rem;
+		}
+
+		section {
+			margin-bottom: 2rem;
+		}
+
+	</style>
+
 	<body>
 		<div class="container">
-			<h1>Fragments UI</h1>
-			<section>
-				<nav>
-					<button id="login">Login</button>
-					<button id="logout">Logout</button>
-				</nav>
-			</section>
+			<!-- make the container in one row-->
+			<div >
+				<h1>Fragments UI</h1>
+				<button id="login">Login</button>
+				<button id="logout">Logout</button>
+			</div>
+
+
 			<section hidden id="user">
 				<h2>Hello <span class="username"></span>!</h2>
 			</section>
+
+			<hr>
+
+			<!-- create an section to allow user to create and post fragments -->
+			<section hidden id="fragments">
+				<h2>Create a new fragment</h2>
+				<form action="/v1/fragments">
+					<!-- create a dropdown of content and give title -->
+					<label for="content">Content-Type: </label>
+					<select name="content" id="content">
+						<option value="text">text/plain</option>
+					</select>
+					<br><br>
+					<label for="title">Data</label>
+					<textarea name="content" id="content"></textarea>
+					<button type="submit">Create</button>
+				</form>
 		</div>
 	</body>
+
 </html>

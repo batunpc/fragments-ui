@@ -1,11 +1,13 @@
 import { Auth, getUser } from './auth';
-import { getUserFragments } from './api';
+import { getUserFragments, getFragmentById, postFragment } from './api';
 
 async function init() {
 	// Get our UI elements
 	const userSection = document.querySelector('#user');
+	const fragmentsSection = document.querySelector('#fragments');
 	const loginBtn = document.querySelector('#login');
 	const logoutBtn = document.querySelector('#logout');
+
 	// See if we're signed in (i.e., we'll have a `user` object)
 	const user = await getUser();
 	// Wire up event handlers to deal with login and logout.
@@ -25,8 +27,8 @@ async function init() {
 	// Log the user info for debugging purposes
 	console.log({ user });
 	// Update the UI to welcome the user
-	//userSection?.classList.remove('hidden');
 	userSection?.attributes.removeNamedItem('hidden');
+	fragmentsSection?.attributes.removeNamedItem('hidden');
 	loginBtn?.setAttribute('disabled', 'true');
 
 	userSection
