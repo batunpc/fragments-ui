@@ -25,8 +25,8 @@ async function getUser() {
 			currentAuthenticatedUser.signInUserSession.idToken.jwtToken;
 		const accessToken =
 			currentAuthenticatedUser.signInUserSession.accessToken.jwtToken;
-		// Return a simplified "user" object
 
+		// Return a simplified "user" object
 		return {
 			username,
 			idToken,

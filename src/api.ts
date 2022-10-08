@@ -15,58 +15,49 @@ export async function getUserFragments(user: any) {
 				Authorization: user.authorizationHeaders().Authorization
 			}
 		});
-		if (!res.ok) {
-			throw new Error(`${res.status} ${res.statusText}`);
-		}
+		if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+
 		const data = await res.json();
-		console.log('Got user fragments data', { data });
-		return { data };
+
+		console.log('Got user fragments data', { fragments: data });
+		return { fragments: data };
 	} catch (err) {
 		console.error('Unable to call GET /v1/fragments', { err });
 	}
 }
 
-export async function getFragmentById(id: string, expand = false) {
+export async function getFragmentById(user: any, id: string) {
 	console.log(`getFragmentById : ${id}`);
-
 	try {
-		const res = await fetch(
-			`${apiUrl}/v1/fragments/${id}?expand=${expand}`
-		);
+		const res = await fetch(`${apiUrl}/v1/fragments/${id}`, {
+			headers: {
+				Authorization: user.authorizationHeaders().Authorization
+			}
+		});
 		if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 		const data = await res.json();
-		console.log('Got fragment data', { data });
-
-		const contentType = res.headers.get('content-type');
-		if (contentType && contentType.indexOf('application/json') !== -1) {
-			try {
-				return { contentType, data: await res.text() };
-			} catch (err) {
-				console.error('Error returning text ', { err });
-			}
-		}
+		console.log('Got user fragments data', { fragments: data });
+		return { fragments: data };
 	} catch (err: any) {
-		console.error('Unable to call GET /v1/fragment/:id', {
-			err: err.message
-		});
+		console.error('Unable to call GET /v1/fragment/:id', { err });
 	}
 }
+// user, contentType, data
+export async function postFragment(user: any, contentType: string, value: any) {
+	console.log('Creating fragment...');
 
-export async function postFragment(user: any, value: any, contentType: string) {
-	console.log('Posting fragment data...');
 	try {
 		const res = await fetch(`${apiUrl}/v1/fragments`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': contentType,
-				...user.authorizationHeaders()
+				Authorization: user.authorizationHeaders().Authorization
 			},
-			body: JSON.stringify({ value })
+			body: value
 		});
 		if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 		const data = await res.json();
-		console.log('Posted fragment data', { data });
-		return data;
+		return { fragments: data };
 	} catch (err: Error | any) {
 		console.error('Unable to call POST /v1/fragment', { err: err.message });
 		throw new Error('Unable to call POST /v1/fragment');

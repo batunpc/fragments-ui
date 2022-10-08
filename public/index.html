@@ -25,7 +25,7 @@
 
 	<body>
 		<div class="container">
-			<!-- make the container in one row-->
+
 			<div >
 				<h1>Fragments UI</h1>
 				<button id="login">Login</button>
@@ -39,21 +39,34 @@
 
 			<hr>
 
-			<!-- create an section to allow user to create and post fragments -->
-			<section hidden id="fragments">
-				<h2>Create a new fragment</h2>
-				<form action="/v1/fragments">
-					<!-- create a dropdown of content and give title -->
-					<label for="content">Content-Type: </label>
-					<select name="content" id="content">
+
+			<section id="fragments">
+				<h3>Create a new fragment</h3>
+
+				<form id="fragmentForm">
+
+					<label> Select Content-Type: </label>
+					<select id="content">
 						<option value="text">text/plain</option>
 					</select>
+
 					<br><br>
-					<label for="title">Data</label>
-					<textarea name="content" id="content"></textarea>
+
+					<label for="title">Text data: </label>
+					<textarea name="textFragment" id="textFragment" cols="30" rows="5"></textarea>
 					<button type="submit">Create</button>
-				</form>
+					
+					<br><br>
+					
+					<label >List of fragments: </label>
+					<ol id="fragmentList">
+						<!-- <li class="fragment"></li> -->
+					</ol>
+					
+
+ 				</form>
+			</section>	
 		</div>
 	</body>
-
 </html>
+
