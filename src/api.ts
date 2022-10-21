@@ -34,8 +34,9 @@ export async function getFragmentById(user: any, id: string) {
     });
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
     const contentType = res.headers.get("Content-Type");
+    const type = contentType?.split(";")[0];
 
-    switch (contentType) {
+    switch (type) {
       case "application/json":
         return { fragment: await res.json() };
       case "text/plain":
