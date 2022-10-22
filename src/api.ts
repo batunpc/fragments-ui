@@ -9,9 +9,13 @@ const apiUrl = process.env.API_URL || "http://localhost:8080";
 
 /*
  = GET =  */
-export async function getUserFragments(user: any) {
+export async function getUserFragments(user: any, expand?: boolean) {
+  console.log("API => Requestion fragments data...");
   try {
-    const res = await fetch(`${apiUrl}/v1/fragments`, {
+    let url = `${apiUrl}/v1/fragments`;
+    if (expand) url += "?expand=1";
+
+    const res = await fetch(url, {
       headers: {
         Authorization: user.authorizationHeaders().Authorization,
       },
@@ -37,10 +41,15 @@ export async function getFragmentById(user: any, id: string) {
     const type = contentType?.split(";")[0];
 
     switch (type) {
-      case "application/json":
-        return { fragment: await res.json() };
       case "text/plain":
         return await res.text();
+      case "text/html":
+        return await res.text();
+      case "text/markdown":
+        return await res.text();
+      case "application/json":
+        return { fragment: await res.json() };
+
       default:
         throw new Error(`Unknown content type: ${contentType}`);
     }

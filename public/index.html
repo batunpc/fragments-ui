@@ -44,17 +44,19 @@
 				<h3>Create a new fragment</h3>
 
 				<form id="fragmentForm">
-
 					<label> Select Content-Type: </label>
-					<select id="content">
+					<select id="fragment-type" name="fragment-type">
 						<option value="text">text/plain</option>
+						<option value="text">text/html</option>
+						<option value="text">text/markdown</option>
+						<option value="text">application/json</option>
 					</select>
 
 					<br><br>
 
 					<label for="title">Text data: </label>
 					<textarea name="textFragment" id="textFragment" cols="30" rows="5"></textarea>
-					<button type="submit">Create</button>
+					<button type="submit" id="postFragmentBtn">Create</button>
 					
 					<br><br>
 					
@@ -62,8 +64,6 @@
 					<ol id="fragmentList">
 						<!-- <li class="fragment"></li> -->
 					</ol>
-					
-
  				</form>
 			</section>	
 		</div>

@@ -5,8 +5,10 @@ import { ErrorMessages, isError } from "./error";
 async function init() {
   // Get our UI elements
   const userSection = document.querySelector("#user");
+  // buttons
   const loginBtn = document.querySelector("#login");
   const logoutBtn = document.querySelector("#logout");
+  const postBtn = document.querySelector("#post");
   const fragmentForm = document.querySelector("form");
   // See if we're signed in (i.e., we'll have a `user` object)
   const user = await getUser();
@@ -18,9 +20,10 @@ async function init() {
 
   logoutBtn ? logoutBtn.addEventListener("click", () => Auth.signOut()) : null;
 
-  user
-    ? logoutBtn?.removeAttribute("disabled")
-    : logoutBtn?.setAttribute("disabled", "true");
+  if (!user) {
+    logoutBtn?.setAttribute("disabled", "true");
+    return;
+  }
 
   // Log the user info for debugging purposes
   console.log({ user });
@@ -47,17 +50,21 @@ async function init() {
     const inputValue = (<HTMLInputElement>(
       document.getElementById("textFragment")
     )).value;
-    const newFragment = await postFragment(user, "text/plain", inputValue);
-    if (isError(newFragment)) {
-      if (newFragment.message === ErrorMessages.postFragmentError)
-        console.log(
-          `Returned POST fragment error ${JSON.stringify(newFragment)}`
-        );
-      else
-        console.log(
-          `Returned POST fragment error ${JSON.stringify(newFragment)}`
-        );
+    if (inputValue === "") return alert(ErrorMessages.emptyFragmentError);
+    else {
+      const newFragment = await postFragment(user, "text/plain", inputValue);
+      if (isError(newFragment)) {
+        if (newFragment.message === ErrorMessages.postFragmentError)
+          console.log(
+            `Returned POST fragment error ${JSON.stringify(newFragment)}`
+          );
+        else
+          console.log(
+            `Returned POST fragment error ${JSON.stringify(newFragment)}`
+          );
+      }
     }
+
     // 2. GET - return all fragments
     // =====
     const fragment = await getUserFragments(user);
