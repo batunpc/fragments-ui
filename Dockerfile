@@ -1,21 +1,30 @@
 
-FROM nginx:1.22.1
+FROM node:16.15.1-bullseye AS dependencies
 
-# setup node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_19.x | bash - &&\
-  apt-get update && apt-get install -y \
-    build-essential \
-    nodejs \
-    && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
 
-# Copy source code to the container
-WORKDIR /usr/local/src/fragments-ui
+COPY package.json package-lock.json tsconfig.json ./src ./
+
+RUN npm ci 
+
+#########################################################
+FROM node:16.15.1-bullseye AS build
+
+WORKDIR /app
+
 COPY . .
+COPY --from=dependencies /app /app/
 
-# Build our site
-RUN npm ci
-# Copy the build to the dir that nginx expects for static sites
-RUN npm run build &&\
-  cp -a ./dist/. /usr/share/nginx/html/
+RUN npm run build
+#########################################################
 
-EXPOSE 80
+FROM nginx:1.22.1 AS deploy
+
+COPY --from=build /app/dist/. /usr/share/nginx/html/
+
+EXPOSE 1234
+
+ENV PORT=1234
+
+HEALTHCHECK --interval=15s --timeout=30s --start-period=10s --retries=3 \
+  CMD curl --fail http://localhost:${PORT} || exit 1

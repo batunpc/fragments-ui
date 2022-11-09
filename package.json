@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "description": "Fragments UI testing web app",
   "scripts": {
-    "start": "(npx parcel ./public/index.html) && (npx parcel watch ./public/index.html)",
-    "build": "tsc",
-    "postinstall": "npm run build"
+    "start": "(npx parcel ./src/index.html) && (npx parcel watch ./src/index.html)",
+    "build": "parcel build src/index.html",
+    "clean": "rm -rf .parcel-cache dist"
   },
   "repository": {
     "type": "git",
@@ -18,12 +18,15 @@
   },
   "license": "UNLICENSED",
   "dependencies": {
-    "aws-amplify": "^4.3.35"
+    "aws-amplify": "^4.3.35",
+    "parcel": "^2.7.0",
+    "typescript": "^4.8.4"
   },
   "devDependencies": {
-    "parcel": "^2.7.0",
+    "@parcel/css": "^1.14.0",
+    "buffer": "^5.7.1",
     "process": "^0.11.10",
-    "querystring-es3": "^0.2.1",
-    "typescript": "^4.8.3"
+    "punycode": "^1.4.1",
+    "querystring-es3": "^0.2.1"
   }
 }
