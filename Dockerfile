@@ -1,5 +1,7 @@
 
-FROM node:16.15.1-bullseye AS dependencies
+FROM node:16.18.1-alpine AS dependencies
+
+RUN apk add --update --no-cache g++ make python3 && ln -sf python3 /usr/bin/python
 
 WORKDIR /app
 
@@ -8,7 +10,7 @@ COPY package.json package-lock.json tsconfig.json ./src ./
 RUN npm ci 
 
 #########################################################
-FROM node:16.15.1-bullseye AS build
+FROM node:16.18.1-alpine AS build
 
 WORKDIR /app
 
