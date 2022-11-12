@@ -31,9 +31,9 @@ export async function getUserFragments(user: any, expand?: boolean) {
 }
 /*
  = GET BY ID =  */
-export async function getFragmentById(user: any, id: string) {
+export async function getFragmentById(user: any, id: string, ext: string = "") {
   try {
-    const res = await fetch(`${apiUrl}/v1/fragments/${id}`, {
+    const res = await fetch(`${apiUrl}/v1/fragments/${id}${ext}`, {
       headers: user.authorizationHeaders(),
     });
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);

@@ -40,21 +40,51 @@
 			<hr>
 
 
-			<section id="fragments">
+			<section id="fragments-form-section" >
 				<h3>Create a new fragment</h3>
 
 				<form id="fragmentForm">
 					<label> Select Content-Type: </label>
-					<select id="fragment-type" name="fragment-type">
-						<option value="text">text/plain</option>
-						<option value="text">text/html</option>
-						<option value="text">text/markdown</option>
-						<option value="text">application/json</option>
-					</select>
+					<div class="content-type-btns">
+						<button type="button" class="text" id="text/plain">text/plain</button>
+						<button type="button" id="text/html">text/html</button>
+						<button type="button" id="text/markdown">text/markdown</button>
+						<button type="button" id="application/json">application/json</button>
+					</div>
+					<div class="content" hidden>
+						<br/>
+						<p >=> Selected Type:
+							<span style="color: #34da58" id="selected-type"></span>
+						</p>
+					</div>
+					<hr>
+					<label> Convert to: </label>
+					<div class="convert-to-btns">
+						<button type="button" id="txt" >text/plain</button>
+						<button type="button" id="html" >text/html</button>
+						<button type="button" id="md">text/markdown</button>
+						<button type="button" id="json">application/json</button>
+					</div>
+					<div class="content" hidden>
+						<br/>
+						<p >Convert To:
+							<span id="convert-type"></span>
+						</p>
+					</div>
 
-					<br><br>
+					<div class="convert-to" >
+						<br/>
+						<p >=> Selected Type:
+							<span style="color: #34da58" id="convert-to"></span>
+						</p>
+					</div>
+
+
+					
+					<br>
 
 					<label for="title">Text data: </label>
+
 					<textarea name="textFragment" id="textFragment" cols="30" rows="5"></textarea>
 					<button type="submit" id="postFragmentBtn">Create</button>
 					

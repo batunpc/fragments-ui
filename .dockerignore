@@ -1,4 +1,6 @@
 .parcel-cache/
 .vscode/
 node_modules/
-
+.git/
+.gitignore
+dist/

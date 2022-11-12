@@ -8,6 +8,7 @@ export const enum ErrorMessages {
   getFragmentByIdError = "Error occurred while getting fragment by id",
   getUserFragmentsError = "Error occurred while getting user fragments",
   emptyFragmentError = "Fragment cannot be empty",
+  emptyContentTypeError = "Content type cannot be empty - Select from button",
 }
 
 export const isError = (
