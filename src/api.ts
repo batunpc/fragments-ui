@@ -57,6 +57,20 @@ export async function getFragmentById(user: any, id: string, ext: string = "") {
     console.error(`Unable to call GET /v1/fragments/${id}`, { err });
   }
 }
+/*= GET BY ID =  */
+
+export async function getFragmentInfo(user: any, id: string) {
+  try {
+    const res = await fetch(`${apiUrl}/v1/fragments/${id}/info`, {
+      headers: user.authorizationHeaders(),
+    });
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    return res.json();
+  } catch (err) {
+    console.error(`Unable to call GET /v1/fragments/${id}`, { err });
+  }
+}
+
 /* 
   = POST = */
 export async function postFragment(user: any, contentType: string, value: any) {

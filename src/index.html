@@ -20,6 +20,17 @@
 		section {
 			margin-bottom: 2rem;
 		}
+		/* make the each li item in fragmentList a box */
+		.fragmentList li {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 1rem;
+			border: 1px solid #34da58;
+			border-radius: .5rem;
+			margin-bottom: 1rem;
+		}
+
 
 	</style>
 
@@ -44,6 +55,7 @@
 				<h3>Create a new fragment</h3>
 
 				<form id="fragmentForm">
+					<!-- ######################################################## -->
 					<label> Select Content-Type: </label>
 					<div class="content-type-btns">
 						<button type="button" class="text" id="text/plain">text/plain</button>
@@ -51,38 +63,32 @@
 						<button type="button" id="text/markdown">text/markdown</button>
 						<button type="button" id="application/json">application/json</button>
 					</div>
-					<div class="content" hidden>
+					<div class="selected-content" hidden>
 						<br/>
-						<p >=> Selected Type:
-							<span style="color: #34da58" id="selected-type"></span>
+						<p >=> Selected Type: 
+							<span style="color: #34da58" id="selected-type-span"></span>
 						</p>
 					</div>
+					<!-- ######################################################## -->
 					<hr>
-					<label> Convert to: </label>
+					<!-- ######################################################## -->
+					<label> Select what to convert to: </label>
 					<div class="convert-to-btns">
 						<button type="button" id="txt" >text/plain</button>
 						<button type="button" id="html" >text/html</button>
 						<button type="button" id="md">text/markdown</button>
 						<button type="button" id="json">application/json</button>
 					</div>
-					<div class="content" hidden>
+					<div class="selected-convert-to" hidden>
 						<br/>
-						<p >Convert To:
-							<span id="convert-type"></span>
+						<p >=> Converting to:
+							<span style="color: #34da58" id="convert-to-span"></span>
 						</p>
 					</div>
 
-					<div class="convert-to" >
-						<br/>
-						<p >=> Selected Type:
-							<span style="color: #34da58" id="convert-to"></span>
-						</p>
-					</div>
+					<!-- ######################################################## -->
 
-
-					
 					<br>
-
 					<label for="title">Text data: </label>
 
 					<textarea name="textFragment" id="textFragment" cols="30" rows="5"></textarea>
@@ -91,7 +97,7 @@
 					<br><br>
 					
 					<label >List of fragments: </label>
-					<ol id="fragmentList">
+					<ol class="fragmentList">
 						<!-- <li class="fragment"></li> -->
 					</ol>
  				</form>

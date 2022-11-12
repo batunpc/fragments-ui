@@ -1,5 +1,10 @@
 import { Auth, getUser } from "./auth";
-import { getUserFragments, getFragmentById, postFragment } from "./api";
+import {
+  getUserFragments,
+  getFragmentById,
+  getFragmentInfo,
+  postFragment,
+} from "./api";
 import { ErrorMessages, isError } from "./error";
 
 async function init() {
@@ -11,7 +16,6 @@ async function init() {
   const postBtn = document.querySelector("#post");
   const fragmentForm = document.querySelector("form");
   const fragmentFormSection = document.querySelector("#fragments-form-section");
-  const content = document.querySelector(".content");
 
   // See if we're signed in (i.e., we'll have a `user` object)
   const user = await getUser();
@@ -42,40 +46,38 @@ async function init() {
   // Do an authenticated request to the fragments API server and log the result
   getUserFragments(user); // api call
 
-  // Dropdown of content types to choose from for fragment
-  // fragmentContentType is a select element with options for content types
-  // when user selects a content type, print the selected option to the console
-  /* 
-    			<button type="button" id="text">text/plain</button>
-					<button type="button" id="html">text/html</button>
-					<button type="button" id="markdown">text/markdown</button>
-					<button type="button" id="json">application/json</button>
-  */
   // when user selects a content type from the buttons above, print the selected option to the console
 
   // ================= content type buttons =================
-  const selectedType = document.getElementById("selected-type");
-  const convertTo = document.getElementById("convert-to");
-  const contentTypeBtns = document.querySelectorAll(".content-type-btns");
+  // hidden divs
+  const selectedContent = document.querySelector(".selected-content");
+  const selectedConvertTo = document.querySelector(".selected-convert-to");
+  // spans that display data type
+  const convertToSpan = document.getElementById("convert-to-span");
+  const selectedTypeSpan = document.getElementById("selected-type-span");
+  //Plural buttons
   const convertToBtns = document.querySelectorAll(".convert-to-btns");
+  const contentTypeBtns = document.querySelectorAll(".content-type-btns");
+
   contentTypeBtns.forEach((btn) => {
     btn.addEventListener("click", (e) => {
-      selectedType!.innerHTML = `${
+      selectedTypeSpan!.innerHTML = `${
         (e.target as HTMLButtonElement).id as string // gets the id of the each button
       }`;
-      console.log(`${selectedType!.innerHTML} selected`);
-      content?.removeAttribute("hidden");
+      console.log(`${selectedTypeSpan!.innerHTML} selected`);
+      selectedContent?.removeAttribute("hidden");
     });
   });
+
   // ================= content type buttons =================
 
   // ================= convert to buttons =================
   convertToBtns.forEach((btn) => {
     btn.addEventListener("click", (e) => {
-      convertTo!.innerHTML = `${
+      convertToSpan!.innerHTML = `${
         (e.target as HTMLButtonElement).id as string // gets the id of the each button
       }`;
-      console.log(`${convertTo!.innerHTML} selected`);
+      selectedConvertTo?.removeAttribute("hidden");
     });
   });
   // ================= formats =================
@@ -93,8 +95,8 @@ async function init() {
   fragmentForm?.addEventListener("submit", fragmentEndpoints);
   async function fragmentEndpoints(e: Event) {
     e.preventDefault();
-    const contentType = document.getElementById("selected-type")?.innerHTML;
-    const convertTo = "." + document.getElementById("convert-to")?.innerHTML;
+    let contentType = document.getElementById("selected-type-span")?.innerHTML;
+    const ext = "." + document.getElementById("convert-to-span")?.innerHTML;
 
     console.log(`posting fragment with content type: ${contentType}`);
     // Value of whatever typed into textarea as data
@@ -104,9 +106,10 @@ async function init() {
 
     // 1. POST - Create a fragment
     // ==========================
-
+    // error handling before posting fragment
     if (inputValue === "") return alert(ErrorMessages.emptyFragmentError);
     if (contentType === "") return alert(ErrorMessages.emptyContentTypeError);
+    if (ext === ".") return alert(ErrorMessages.emptyConvertToError);
     else {
       if (contentType) {
         // successfull post
@@ -127,9 +130,10 @@ async function init() {
         }
       }
     }
-    console.log(`Request to convert ${contentType} to ${convertTo}`);
+    console.log(`Request to convert ${contentType} to ${ext}`);
 
     const fragment = await getUserFragments(user);
+
     if (isError(fragment)) {
       if (fragment.message === ErrorMessages.getUserFragmentsError)
         console.log(`Returned GET fragment error ${JSON.stringify(fragment)}`);
@@ -147,21 +151,46 @@ async function init() {
       const supportedExts = formats(contentType);
       console.log("Supported extensions are => ", supportedExts);
     }
+    // get by id
+    const fragmentById = await getFragmentById(user, newFragmentId, ext);
+    // get fragment info
+    const fragmentInfo = await getFragmentInfo(user, newFragmentId);
+    console.log("fragmentInfo: ", fragmentInfo);
+    console.log("fragmentInfo type =>", fragmentInfo?.fragment.type);
+    const createdAt = fragmentInfo?.fragment.created;
 
-    const fragmentById = await getFragmentById(user, newFragmentId, convertTo);
+    if (ext === ".txt") {
+      contentType = "text/plain";
+    } else if (ext === ".md") {
+      contentType = "text/markdown";
+    } else if (ext === ".html") {
+      contentType = "text/html";
+    } else if (ext === ".json") {
+      contentType = "application/json";
+    }
+    console.log("Updated fragment type =>", contentType);
 
-    // List of fragment Ids
-    // ====================
-    const fragmentList = document.querySelector("#fragmentList");
+    // dspData and dspType are going out of the list item display all in one list item li element
+    const fragmentList = document.querySelector(".fragmentList");
     const fragmentListItem = document.createElement("li");
     fragmentListItem.classList.add("fragment");
+
     const dspId = `Fragment ID: ${newFragmentId}`;
-    //fragmentListItem.appendChild(document.createTextNode(newFragmentId));
     fragmentListItem.appendChild(document.createTextNode(dspId));
     fragmentList?.appendChild(fragmentListItem);
-    // append data to fragmentList
+
     const dspData = `Fragment Data: ${JSON.stringify(fragmentById)}`;
-    fragmentList?.appendChild(document.createTextNode(dspData));
+
+    fragmentListItem.appendChild(document.createElement("br"));
+    fragmentListItem.appendChild(document.createTextNode(dspData));
+
+    const dspType = `\nFragment Type: ${contentType}`;
+    fragmentListItem.appendChild(document.createElement("br"));
+    fragmentListItem.appendChild(document.createTextNode(dspType));
+
+    const dspCreatedAt = `\nCreated At: ${createdAt}`;
+    fragmentListItem.appendChild(document.createElement("br"));
+    fragmentListItem.appendChild(document.createTextNode(dspCreatedAt));
   }
 }
 
