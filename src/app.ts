@@ -13,9 +13,7 @@ async function init() {
   // buttons
   const loginBtn = document.querySelector("#login");
   const logoutBtn = document.querySelector("#logout");
-  const postBtn = document.querySelector("#post");
   const fragmentForm = document.querySelector("form");
-  const fragmentFormSection = document.querySelector("#fragments-form-section");
 
   // See if we're signed in (i.e., we'll have a `user` object)
   const user = await getUser();
@@ -179,11 +177,6 @@ async function init() {
     fragmentListItem.appendChild(document.createTextNode(dspId));
     fragmentList?.appendChild(fragmentListItem);
 
-    const dspData = `Fragment Data: ${JSON.stringify(fragmentById)}`;
-
-    fragmentListItem.appendChild(document.createElement("br"));
-    fragmentListItem.appendChild(document.createTextNode(dspData));
-
     const dspType = `\nFragment Type: ${contentType}`;
     fragmentListItem.appendChild(document.createElement("br"));
     fragmentListItem.appendChild(document.createTextNode(dspType));
@@ -191,6 +184,10 @@ async function init() {
     const dspCreatedAt = `\nCreated At: ${createdAt}`;
     fragmentListItem.appendChild(document.createElement("br"));
     fragmentListItem.appendChild(document.createTextNode(dspCreatedAt));
+
+    const dspData = `Fragment Data: ${JSON.stringify(fragmentById)}`;
+    fragmentListItem.appendChild(document.createElement("br"));
+    fragmentListItem.appendChild(document.createTextNode(dspData));
   }
 }
 

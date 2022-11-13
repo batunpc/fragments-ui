@@ -9,6 +9,13 @@ const apiUrl = process.env.API_URL || "http://localhost:8080";
 
 /*
  = GET =  */
+// interface for Fragment metadata
+interface Fragment {
+  id: string;
+  contentType: string;
+  createdAt: string;
+}
+
 export async function getUserFragments(user: any, expand?: boolean) {
   console.log("API => Requestion fragments data...");
   try {
