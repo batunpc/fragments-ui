@@ -156,6 +156,8 @@ async function init() {
     console.log("fragmentInfo: ", fragmentInfo);
     console.log("fragmentInfo type =>", fragmentInfo?.fragment.type);
     const createdAt = fragmentInfo?.fragment.created;
+    // use Date(fragments.createdAt).toLocaleString() to format date in a readable format for createdAt
+    const formattedDate = new Date(createdAt).toLocaleString();
 
     if (ext === ".txt") {
       contentType = "text/plain";
@@ -181,7 +183,7 @@ async function init() {
     fragmentListItem.appendChild(document.createElement("br"));
     fragmentListItem.appendChild(document.createTextNode(dspType));
 
-    const dspCreatedAt = `\nCreated At: ${createdAt}`;
+    const dspCreatedAt = `\nCreated At: ${formattedDate}`;
     fragmentListItem.appendChild(document.createElement("br"));
     fragmentListItem.appendChild(document.createTextNode(dspCreatedAt));
 
