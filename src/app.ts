@@ -91,6 +91,7 @@ async function init() {
   // ========================================================
   // FRAGMENT FORM
   fragmentForm?.addEventListener("submit", fragmentEndpoints);
+  const fragment_result = await getUserFragments(user, true);
   async function fragmentEndpoints(e: Event) {
     e.preventDefault();
     let contentType = document.getElementById("selected-type-span")?.innerHTML;
@@ -130,19 +131,21 @@ async function init() {
     }
     console.log(`Request to convert ${contentType} to ${ext}`);
 
-    const fragment = await getUserFragments(user);
-
-    if (isError(fragment)) {
-      if (fragment.message === ErrorMessages.getUserFragmentsError)
-        console.log(`Returned GET fragment error ${JSON.stringify(fragment)}`);
+    if (isError(fragment_result)) {
+      if (fragment_result.message === ErrorMessages.getUserFragmentsError)
+        console.log(
+          `Returned GET fragment error ${JSON.stringify(fragment_result)}`
+        );
       else
-        console.log(`Returned GET fragment error ${JSON.stringify(fragment)}`);
+        console.log(
+          `Returned GET fragment error ${JSON.stringify(fragment_result)}`
+        );
     }
 
     //3. GET - return a specific fragment by ID
     // =====
-    const totalLength = fragment?.fragments.data.length;
-    const newFragmentId = fragment?.fragments.data[totalLength - 1];
+    //const totalLength = fragment_result?.fragments.length;
+    //const newFragmentId = fragment_result?.fragments.data[totalLength - 1];
 
     // =====
     if (contentType) {
@@ -150,14 +153,14 @@ async function init() {
       console.log("Supported extensions are => ", supportedExts);
     }
     // get by id
-    const fragmentById = await getFragmentById(user, newFragmentId, ext);
+    //const fragmentById = await getFragmentById(user, newFragmentId, ext);
     // get fragment info
-    const fragmentInfo = await getFragmentInfo(user, newFragmentId);
-    console.log("fragmentInfo: ", fragmentInfo);
-    console.log("fragmentInfo type =>", fragmentInfo?.fragment.type);
-    const createdAt = fragmentInfo?.fragment.created;
+    //const fragmentInfo = await getFragmentInfo(user, newFragmentId);
+    // console.log("fragmentInfo: ", fragmentInfo);
+    // console.log("fragmentInfo type =>", fragmentInfo?.fragment.type);
+    // const createdAt = fragmentInfo?.fragment.created;
     // use Date(fragments.createdAt).toLocaleString() to format date in a readable format for createdAt
-    const formattedDate = new Date(createdAt).toLocaleString();
+    //const formattedDate = new Date(createdAt).toLocaleString();
 
     if (ext === ".txt") {
       contentType = "text/plain";
@@ -169,28 +172,29 @@ async function init() {
       contentType = "application/json";
     }
     console.log("Updated fragment type =>", contentType);
+  }
 
-    // dspData and dspType are going out of the list item display all in one list item li element
+  fragment_result.data.forEach((fragment: any) => {
     const fragmentList = document.querySelector(".fragmentList");
     const fragmentListItem = document.createElement("li");
     fragmentListItem.classList.add("fragment");
 
-    const dspId = `Fragment ID: ${newFragmentId}`;
+    const dspId = `Fragment ID: ${fragment.id}`;
     fragmentListItem.appendChild(document.createTextNode(dspId));
     fragmentList?.appendChild(fragmentListItem);
 
-    const dspType = `\nFragment Type: ${contentType}`;
+    const dspType = `\nFragment Type: ${fragment.type}`;
     fragmentListItem.appendChild(document.createElement("br"));
     fragmentListItem.appendChild(document.createTextNode(dspType));
 
-    const dspCreatedAt = `\nCreated At: ${formattedDate}`;
+    const dspCreatedAt = `\nCreated At: ${fragment.created}`;
     fragmentListItem.appendChild(document.createElement("br"));
     fragmentListItem.appendChild(document.createTextNode(dspCreatedAt));
 
-    const dspData = `Fragment Data: ${JSON.stringify(fragmentById)}`;
+    const dspData = `Fragment Data: ${fragment.data}`;
     fragmentListItem.appendChild(document.createElement("br"));
     fragmentListItem.appendChild(document.createTextNode(dspData));
-  }
+  });
 }
 
 // Wait for the DOM to be ready, then start the app

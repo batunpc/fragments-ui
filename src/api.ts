@@ -31,7 +31,7 @@ export async function getUserFragments(user: any, expand?: boolean) {
 
     const data = await res.json();
     console.log("Got user fragments data", { fragments: data });
-    return { fragments: data };
+    return data;
   } catch (err) {
     console.error("Unable to call GET /v1/fragments", { err });
   }
