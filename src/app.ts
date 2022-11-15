@@ -152,15 +152,6 @@ async function init() {
       const supportedExts = formats(contentType);
       console.log("Supported extensions are => ", supportedExts);
     }
-    // get by id
-    //const fragmentById = await getFragmentById(user, newFragmentId, ext);
-    // get fragment info
-    //const fragmentInfo = await getFragmentInfo(user, newFragmentId);
-    // console.log("fragmentInfo: ", fragmentInfo);
-    // console.log("fragmentInfo type =>", fragmentInfo?.fragment.type);
-    // const createdAt = fragmentInfo?.fragment.created;
-    // use Date(fragments.createdAt).toLocaleString() to format date in a readable format for createdAt
-    //const formattedDate = new Date(createdAt).toLocaleString();
 
     if (ext === ".txt") {
       contentType = "text/plain";
@@ -187,13 +178,26 @@ async function init() {
     fragmentListItem.appendChild(document.createElement("br"));
     fragmentListItem.appendChild(document.createTextNode(dspType));
 
-    const dspCreatedAt = `\nCreated At: ${fragment.created}`;
+    const fragmentSize = `\nFragment Size: ${fragment.size}`;
+    fragmentListItem.appendChild(document.createElement("br"));
+    fragmentListItem.appendChild(document.createTextNode(fragmentSize));
+
+    const formattedDate = new Date(fragment.created).toLocaleString(); // format date in a readable format for createdAt
+    const dspCreatedAt = `\nCreated At: ${formattedDate}`;
     fragmentListItem.appendChild(document.createElement("br"));
     fragmentListItem.appendChild(document.createTextNode(dspCreatedAt));
 
-    const dspData = `Fragment Data: ${fragment.data}`;
-    fragmentListItem.appendChild(document.createElement("br"));
-    fragmentListItem.appendChild(document.createTextNode(dspData));
+    fragmentListItem.style.color = "white";
+    fragmentListItem.style.backgroundColor = "black";
+
+    // add a button to each list item
+    // const fragmentBtn = document.createElement("button");
+    // fragmentBtn.classList.add("fragmentBtn");
+    // fragmentBtn.innerHTML = "Convert";
+    // fragmentListItem.appendChild(fragmentBtn);
+    // const dspData = `Fragment Data: ${fragment.data}`;
+    // fragmentListItem.appendChild(document.createElement("br"));
+    // fragmentListItem.appendChild(document.createTextNode(dspData));
   });
 }
 
