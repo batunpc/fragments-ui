@@ -17,7 +17,7 @@ interface Fragment {
 }
 
 export async function getUserFragments(user: any, expand?: boolean) {
-  console.log("API => Requestion fragments data...");
+  console.log("API => Requesting fragments data...");
   try {
     let url = `${apiUrl}/v1/fragments`;
     if (expand) url += "?expand=1";
@@ -31,7 +31,7 @@ export async function getUserFragments(user: any, expand?: boolean) {
 
     const data = await res.json();
     console.log("Got user fragments data", { fragments: data });
-    return data;
+    return { fragments: data };
   } catch (err) {
     console.error("Unable to call GET /v1/fragments", { err });
   }
