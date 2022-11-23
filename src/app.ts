@@ -30,7 +30,7 @@ const authHandler = async () => {
 
 async function init() {
   const user = await authHandler(); // User info
-
+  createFragmentCard();
   // Form where fragment is created
   const createFragmentForm = document.getElementById("create-fragment-form");
 
@@ -47,12 +47,12 @@ async function init() {
   // == POST == //
   createFragmentForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    // check if element is null
+
     const fragmentType = fragmentTypeDropdown.value;
     const fragmentData = fragmentInput.value.trim();
 
-    postFragment(user, fragmentType, fragmentData);
-
+    await postFragment(user, fragmentType, fragmentData);
+    createFragmentCard();
     fragmentInput.value = "";
     console.log("Fragment created");
   });
@@ -85,8 +85,10 @@ async function init() {
   function createFragmentCard() {
     const listOfFragments = getUserFragments(user, true);
     listOfFragments.then((data) => {
-      const fragmentCards = document.querySelector("#fragmentCards");
-
+      const metadataCard = document.querySelector(
+        "#metadataCard"
+      ) as HTMLElement;
+      metadataCard.innerHTML = "";
       data?.fragments.data.forEach((fragment: any) => {
         const fragmentDiv = document.createElement("div");
         fragmentDiv.setAttribute(
@@ -104,7 +106,6 @@ async function init() {
            border: 5px solid #103664; 
            font-size: 17px;`
         );
-        // add style bold to every span in fragmentDiv
 
         const formattedDate = new Date(fragment.created).toLocaleString();
         fragmentDiv.innerHTML = `<span> Fragment ID:</span> <i> ${fragment.id} </i> <br>
@@ -121,15 +122,14 @@ async function init() {
         fragmentDiv.querySelectorAll("i").forEach((i) => {
           i.setAttribute(
             "style",
-            /* code block */
-            "background-color: #313131; color: #c7c7c7; padding: 4px; border-radius: 5px; color: #ECECEC;"
+            /* fragment id  */
+            "background-color: #5a5a5a; border: 1px solid #313131; color: #c7c7c7; padding: 3px; border-radius: 5px; color: #ECECEC;"
           );
         });
-        fragmentCards?.appendChild(fragmentDiv);
+        metadataCard?.appendChild(fragmentDiv);
       });
     });
   }
-  createFragmentCard();
 }
 
 // Wait for the DOM to be ready, then start the app

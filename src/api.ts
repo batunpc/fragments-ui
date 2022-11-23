@@ -13,7 +13,8 @@ const apiUrl = process.env.API_URL || "http://localhost:8080";
 interface Fragment {
   id: string;
   contentType: string;
-  createdAt: string;
+  size: string;
+  created: Date;
 }
 
 export async function getUserFragments(user: any, expand?: boolean) {
@@ -38,7 +39,11 @@ export async function getUserFragments(user: any, expand?: boolean) {
 }
 /*
  = GET BY ID =  */
-export async function getFragmentById(user: any, id: string, ext: string = "") {
+export async function getFragmentById(
+  user: any,
+  id: Fragment,
+  ext: string = ""
+) {
   try {
     const res = await fetch(`${apiUrl}/v1/fragments/${id}${ext}`, {
       headers: user.authorizationHeaders(),
@@ -66,7 +71,7 @@ export async function getFragmentById(user: any, id: string, ext: string = "") {
 }
 /*= GET BY ID =  */
 
-export async function getFragmentInfo(user: any, id: string) {
+export async function getFragmentInfo(user: any, id: Fragment) {
   try {
     const res = await fetch(`${apiUrl}/v1/fragments/${id}/info`, {
       headers: user.authorizationHeaders(),

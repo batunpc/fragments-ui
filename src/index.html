@@ -17,6 +17,14 @@
 		width: 100%;
 
 	}
+	.postFragmentSection{
+		margin: 0 auto;
+		width: 100%;
+
+
+		border-radius: 1.5rem;
+
+	}
 	.fragmentListSection {	
 		margin: 25px auto;
 		overflow: scroll;
@@ -37,7 +45,7 @@
 
 
 
-	#fragmentCards .container {
+	#metadataCard .container {
 		color: #000000;
 		background-color: #ffffff;
 		margin: 10px;
@@ -49,7 +57,7 @@
 		text-align: left;
 		border-radius: 20px;
 	}
-	#fragmentCards .container > span {
+	#metadataCard .container > span {
 		display: block;
 		color: darkcyan;
 		font-size: small;
@@ -72,7 +80,7 @@
 
 		<!-- ============== POST OP ================ -->
 		<hr />
-		<section id="postFragment">
+		<section class="postFragmentSection">
 			<h3>Create fragment</h3>
 			<form id="create-fragment-form">
 				<!-- dropdown -->
@@ -87,7 +95,7 @@
 				<label for="fragmentData">Enter fragment data: </label>
 				<input placeholder="(i.e ## Data)" id="fragmentData" name="fragmentData" required> </input>
 
-				<input type="submit" value="Post Fragment" style="margin-top: 10px" />
+				<input type="submit" value="Post Fragment" />
 			</form>
 		</section>
 
@@ -101,7 +109,7 @@
 			
 			<!-- create a list that is scrollable with overflow -->
 			<div class="fragments-card-section">
-				<div id="fragmentCards">
+				<div id="metadataCard">
 
 				</div>
 			</div>
