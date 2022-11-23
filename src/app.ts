@@ -1,204 +1,206 @@
-import { Auth, getUser } from "./auth";
+// src/app.js
+
+import authHandler from "../utils/index";
+
 import {
-  getUserFragments,
   getFragmentById,
-  getFragmentInfo,
+  getUserFragments,
   postFragment,
+  deleteFragment,
 } from "./api";
-import { ErrorMessages, isError } from "./error";
 
 async function init() {
-  // Get our UI elements
-  const userSection = document.querySelector("#user");
-  // buttons
-  const loginBtn = document.querySelector("#login");
-  const logoutBtn = document.querySelector("#logout");
-  const fragmentForm = document.querySelector("form");
+  const user = await authHandler(); // User info
 
-  // See if we're signed in (i.e., we'll have a `user` object)
-  const user = await getUser();
+  if (user) createFragmentCard();
 
-  // Wire up event handlers to deal with login and logout.
-  loginBtn
-    ? loginBtn.addEventListener("click", () => Auth.federatedSignIn())
-    : null;
+  // Form where fragment is created
+  const createFragmentForm = document.getElementById("create-fragment-form");
 
-  logoutBtn ? logoutBtn.addEventListener("click", () => Auth.signOut()) : null;
+  // Dropdown menu to select fragment type
+  const fragmentTypeDropdown = document.getElementById(
+    "fragment-type-dropdown"
+  ) as HTMLSelectElement;
 
-  if (!user) {
-    logoutBtn?.setAttribute("disabled", "true");
-    return;
-  }
+  // Textarea where fragment data is written
+  const fragmentInput = document.getElementById(
+    "fragmentData"
+  ) as HTMLInputElement;
 
-  // Log the user info for debugging purposes
-  console.log({ user });
-  // Update the UI to welcome the user
-  userSection?.attributes.removeNamedItem("hidden");
-  loginBtn?.setAttribute("disabled", "true");
-
-  userSection
-    ?.querySelector(".username")
-    ?.appendChild(document.createTextNode(user?.username));
-  loginBtn?.classList.add("hidden");
-
-  // Do an authenticated request to the fragments API server and log the result
-  getUserFragments(user); // api call
-
-  // when user selects a content type from the buttons above, print the selected option to the console
-
-  // ================= content type buttons =================
-  // hidden divs
-  const selectedContent = document.querySelector(".selected-content");
-  const selectedConvertTo = document.querySelector(".selected-convert-to");
-  // spans that display data type
-  const convertToSpan = document.getElementById("convert-to-span");
-  const selectedTypeSpan = document.getElementById("selected-type-span");
-  //Plural buttons
-  const convertToBtns = document.querySelectorAll(".convert-to-btns");
-  const contentTypeBtns = document.querySelectorAll(".content-type-btns");
-
-  contentTypeBtns.forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      selectedTypeSpan!.innerHTML = `${
-        (e.target as HTMLButtonElement).id as string // gets the id of the each button
-      }`;
-      console.log(`${selectedTypeSpan!.innerHTML} selected`);
-      selectedContent?.removeAttribute("hidden");
-    });
-  });
-
-  // ================= content type buttons =================
-
-  // ================= convert to buttons =================
-  convertToBtns.forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      convertToSpan!.innerHTML = `${
-        (e.target as HTMLButtonElement).id as string // gets the id of the each button
-      }`;
-      selectedConvertTo?.removeAttribute("hidden");
-    });
-  });
-  // ================= formats =================
-  const formats = (mimeType: string) => {
-    if (mimeType === "text/plain") return [".txt"];
-    if (mimeType === "text/markdown") return [".md", ".html", ".txt"];
-    if (mimeType === "text/html") return [".html", ".txt"];
-    if (mimeType === "application/json") return [".json", ".txt"];
-
-    return [];
-  };
-
-  // ========================================================
-  // FRAGMENT FORM
-  fragmentForm?.addEventListener("submit", fragmentEndpoints);
-  const fragment_result = await getUserFragments(user, true);
-  async function fragmentEndpoints(e: Event) {
+  // == POST == //
+  createFragmentForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    let contentType = document.getElementById("selected-type-span")?.innerHTML;
-    const ext = "." + document.getElementById("convert-to-span")?.innerHTML;
 
-    console.log(`posting fragment with content type: ${contentType}`);
-    // Value of whatever typed into textarea as data
-    const inputValue = (<HTMLInputElement>(
-      document.getElementById("textFragment")
-    )).value;
+    const fragmentType = fragmentTypeDropdown.value;
+    const fragmentData = fragmentInput.value.trim();
 
-    // 1. POST - Create a fragment
-    // ==========================
-    // error handling before posting fragment
-    if (inputValue === "") return alert(ErrorMessages.emptyFragmentError);
-    if (contentType === "") return alert(ErrorMessages.emptyContentTypeError);
-    if (ext === ".") return alert(ErrorMessages.emptyConvertToError);
-    else {
-      if (contentType) {
-        // successfull post
-        const postedFragment = await postFragment(
-          user,
-          contentType,
-          inputValue
-        );
-        console.log("postedFragment: ", postedFragment);
-        // error handling
-        if (isError(postedFragment)) {
-          if (postedFragment.message === ErrorMessages.postFragmentError)
-            console.log(
-              `Returned POST postedFragment error ${JSON.stringify(
-                postedFragment
-              )}`
-            );
-        }
-      }
-    }
-    console.log(`Request to convert ${contentType} to ${ext}`);
+    const fragment = await postFragment(user, fragmentType, fragmentData);
 
-    if (isError(fragment_result)) {
-      if (fragment_result.message === ErrorMessages.getUserFragmentsError)
-        console.log(
-          `Returned GET fragment error ${JSON.stringify(fragment_result)}`
-        );
-      else
-        console.log(
-          `Returned GET fragment error ${JSON.stringify(fragment_result)}`
-        );
-    }
-
-    //3. GET - return a specific fragment by ID
-    // =====
-    //const totalLength = fragment_result?.fragments.length;
-    //const newFragmentId = fragment_result?.fragments.data[totalLength - 1];
-
-    // =====
-    if (contentType) {
-      const supportedExts = formats(contentType);
-      console.log("Supported extensions are => ", supportedExts);
-    }
-
-    if (ext === ".txt") {
-      contentType = "text/plain";
-    } else if (ext === ".md") {
-      contentType = "text/markdown";
-    } else if (ext === ".html") {
-      contentType = "text/html";
-    } else if (ext === ".json") {
-      contentType = "application/json";
-    }
-    console.log("Updated fragment type =>", contentType);
-  }
-
-  fragment_result.data.forEach((fragment: any) => {
-    const fragmentList = document.querySelector(".fragmentList");
-    const fragmentListItem = document.createElement("li");
-    fragmentListItem.classList.add("fragment");
-
-    const dspId = `Fragment ID: ${fragment.id}`;
-    fragmentListItem.appendChild(document.createTextNode(dspId));
-    fragmentList?.appendChild(fragmentListItem);
-
-    const dspType = `\nFragment Type: ${fragment.type}`;
-    fragmentListItem.appendChild(document.createElement("br"));
-    fragmentListItem.appendChild(document.createTextNode(dspType));
-
-    const fragmentSize = `\nFragment Size: ${fragment.size}`;
-    fragmentListItem.appendChild(document.createElement("br"));
-    fragmentListItem.appendChild(document.createTextNode(fragmentSize));
-
-    const formattedDate = new Date(fragment.created).toLocaleString(); // format date in a readable format for createdAt
-    const dspCreatedAt = `\nCreated At: ${formattedDate}`;
-    fragmentListItem.appendChild(document.createElement("br"));
-    fragmentListItem.appendChild(document.createTextNode(dspCreatedAt));
-
-    fragmentListItem.style.color = "white";
-    fragmentListItem.style.backgroundColor = "black";
-
-    // add a button to each list item
-    // const fragmentBtn = document.createElement("button");
-    // fragmentBtn.classList.add("fragmentBtn");
-    // fragmentBtn.innerHTML = "Convert";
-    // fragmentListItem.appendChild(fragmentBtn);
-    // const dspData = `Fragment Data: ${fragment.data}`;
-    // fragmentListItem.appendChild(document.createElement("br"));
-    // fragmentListItem.appendChild(document.createTextNode(dspData));
+    createFragmentCard();
+    fragmentInput.value = "";
+    console.log("Fragment created", { fragment });
+    console.log(`Posted fragment of type ${fragmentType}`);
   });
+
+  function createFragmentCard() {
+    const listOfFragments = getUserFragments(user, true);
+    listOfFragments.then((data) => {
+      const metadataCard = document.querySelector(
+        "#metadataCard"
+      ) as HTMLElement;
+      metadataCard.innerHTML = "";
+      console.log("current metadata: ", data?.fragments.fragments);
+      data?.fragments.fragments.forEach((fragment: any) => {
+        const fragmentDiv = document.createElement("div");
+        fragmentDiv.setAttribute(
+          "style",
+          `color: #233142;
+           background-color: #DBE2EF;
+           margin: 10px; 
+           padding: 10px; 
+           width: 95%; 
+           overflow: scroll; 
+           display: inline-block; 
+           vertical-align: top; 
+           text-align: left; 
+           border-radius: 20px; 
+           border: 5px solid #103664; 
+           font-size: 17px;`
+        );
+
+        const formattedDate = new Date(fragment.created).toLocaleString(
+          "en-US",
+          {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+          }
+        );
+
+        fragmentDiv.innerHTML = `<span> Fragment ID:</span> <i> ${fragment.id} </i> <br>
+                                <span> Content-Type:</span> <i>${fragment.type}</i> <br>
+                                <span> Fragment Size:</span> ${fragment.size}  <br>
+                                <span> Created:</span> ${formattedDate}  `;
+        // == Delete button == //
+        const deleteBtn = document.createElement("button");
+        deleteBtn.setAttribute("class", "btn btn-danger btn-sm");
+        deleteBtn.setAttribute("style", "float: right;");
+        deleteBtn.innerHTML = "Delete Fragment";
+        deleteBtn.addEventListener("click", async () => {
+          await deleteFragment(user, fragment.id);
+          createFragmentCard();
+        });
+        fragmentDiv.appendChild(deleteBtn);
+
+        // == View Fragment button == //
+        const getDataBtn = document.createElement("button");
+        getDataBtn.setAttribute("class", "btn btn-dark btn-sm");
+        getDataBtn.setAttribute("style", "float: right; margin-right: 10px;");
+        getDataBtn.innerHTML = "View Fragment ";
+        const fragmentDataDiv = document.createElement("div");
+        fragmentDataDiv.setAttribute(
+          "style",
+          `color: #233142;
+            background-color: #DBE2EF;
+            margin: 10px;
+            padding: 10px;
+            width: 90%;
+            overflow: scroll;
+            display: inline-block;
+            vertical-align: top;
+            text-align: left;
+            border-radius: 20px;
+            border: 3px solid #103664;
+            font-size: 17px;
+            display: none;`
+        );
+
+        getDataBtn.addEventListener("click", async () => {
+          const fragmentData = await getFragmentById(user, fragment.id);
+          //console.log("Fragment Data", fragmentData);
+          fragmentDataDiv.innerHTML = `<span> Fragment Data:</span> ${fragmentData}<br>`;
+          // add label for fragmentTypeDropdown
+          const fragmentTypeLabel = document.createElement("label");
+          fragmentTypeLabel.setAttribute("for", "fragment-type-dropdown");
+          fragmentTypeLabel.innerHTML = "Select type to convert : ";
+          fragmentDataDiv.appendChild(fragmentTypeLabel);
+          // add dropdown menu to select fragment type
+          const fragmentTypeDropdown = document.createElement("select");
+          fragmentTypeDropdown.setAttribute("id", "fragment-type-dropdown");
+          fragmentTypeDropdown.setAttribute(
+            "style",
+            "margin: 5px 10px; padding: 10px; width: 90%;"
+          );
+          fragmentTypeDropdown.innerHTML = `<option value=".txt">text/plain</option>
+                                            <option value=".html">text/html</option>
+                                            <option value=".md">text/markdown</option>
+                                            <option value=".js">application/json</option>`;
+          fragmentDataDiv.appendChild(fragmentTypeDropdown);
+
+          // ADD CONVERT BUTTON
+          const convertBtn = document.createElement("button");
+          convertBtn.setAttribute("class", "btn btn-info btn-sm");
+          convertBtn.setAttribute("style", "float: right; margin-right: 10px;");
+          convertBtn.innerHTML = "Convert Fragment";
+          convertBtn.addEventListener("click", async () => {
+            const fragmentType = fragmentTypeDropdown.value;
+            console.log("Fragment Type", fragmentType);
+
+            getFragmentById(user, fragment.id, fragmentType).then((data) => {
+              console.log("Converted Fragment", data);
+              fragmentDataDiv.innerHTML = `Converted to ${fragmentType}: ${data}`;
+              fragmentDataDiv.innerHTML = fragmentDataDiv.innerHTML.replace(
+                /</g,
+                "&lt;"
+              );
+              fragmentDataDiv.innerHTML = fragmentDataDiv.innerHTML.replace(
+                />/g,
+                "&gt;"
+              );
+              if (!data) {
+                fragmentDataDiv.innerHTML = "415: Unsupported Media Type";
+              }
+            });
+          });
+          fragmentDataDiv.appendChild(convertBtn);
+
+          fragmentDiv.appendChild(fragmentDataDiv);
+          // toggle button to hide and show fragment data
+          if (fragmentDataDiv.style.display === "none") {
+            fragmentDataDiv.style.display = "block";
+            getDataBtn.innerHTML = "Hide Fragment";
+          } else {
+            fragmentDataDiv.style.display = "none";
+            getDataBtn.innerHTML = "View Fragment ";
+          }
+        });
+
+        fragmentDiv.appendChild(getDataBtn);
+
+        metadataCard.appendChild(fragmentDiv);
+
+        fragmentDiv.querySelectorAll("span").forEach((span) => {
+          span.setAttribute(
+            "style",
+            ` color: #3F72AF; font-weight: 700; font-family: 'Courier New', Courier, monospace;`
+          );
+        });
+
+        fragmentDiv.querySelectorAll("i").forEach((i) => {
+          i.setAttribute(
+            "style",
+            // fragment id and content-type
+            "background-color: #3C4048; color: #00ABB3; padding: 2px 5px; border-radius: 5px; font-weight: 500;"
+          );
+        });
+
+        metadataCard?.appendChild(fragmentDiv);
+      });
+    });
+  }
 }
 
 // Wait for the DOM to be ready, then start the app

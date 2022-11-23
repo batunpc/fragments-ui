@@ -4,111 +4,121 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Fragments UI</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+		integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous" />
 	<link rel="stylesheet" href="https://unpkg.com/bamboo.css" />
 	<script type="module" src="./app.ts"></script>
 </head>
+<style>
+	#app {
+		margin: 0 auto;
+
+		/* responsive */
+		width: 100%;
+
+	}
+
+	.postFragmentSection {
+		margin: 0 auto;
+		width: 100%;
+
+
+		border-radius: 1.5rem;
+
+	}
+
+	.fragmentListSection {
+		margin: 25px auto;
+		overflow: scroll;
+		width: 100%;
+		height: 500px;
+		background-color: #292E39;
+		border-radius: 1.5rem;
+		padding: 1rem;
+		text-align: center;
+	}
+
+	.title {
+		background-color: #292E39;
+		border-radius: 1.5rem 1.5rem 0 0;
+
+		text-align: center;
+		margin: 0 auto;
+	}
+
+
+
+	#metadataCard .container {
+		color: #000000;
+		background-color: #ffffff;
+		margin: 10px;
+		padding: 10px;
+		width: 70%;
+		overflow: scroll;
+		display: inline-block;
+		vertical-align: top;
+		text-align: left;
+		border-radius: 20px;
+	}
+
+	#metadataCard .container>span {
+		display: block;
+		color: darkcyan;
+		font-size: small;
+	}
+
+</style>
 
 <body>
-	<style>
-		/* border */
-		.container {
-			border: 4px solid #292E39;
-			padding: 3rem;
-			border-radius: .5rem;
-			width: 110%;
-			margin-left: -5%;
-		}
-
-		section {
-			margin-bottom: 2rem;
-		}
-		/* make the each li item in fragmentList a box */
-		.fragmentList li {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			padding: 1rem;
-			border: 1px solid #34da58;
-			border-radius: .5rem;
-			margin-bottom: 1rem;
-			width : 100%;
-		}
-		.fragmentList li> span {
-			color: #34da58;
-		}
+	<div id="app">
+		<h1>Fragments UI</h1>
+		<section>
+			<nav>
+				<button class="btn btn-outline-primary" id="login">Login</button> 
+				<button class="btn btn-outline-primary"
+					id="logout">Logout</button>
+			</nav>
+		</section>
+		<section hidden id="user">
+			<h2>Hello <span class="username"></span>!</h2>
+		</section>
 
 
-	</style>
+		<hr />
+		<section class="postFragmentSection">
+			<h3>Create fragment</h3>
+			<form id="create-fragment-form">
+				<!-- dropdown -->
+				<label for="create-fragment-type">Select Content-Type: </label>
+				<select id="fragment-type-dropdown">
+					<option value="text/markdown">text/markdown</option>
+					<option value="text/html">text/html</option>
+					<option value="text/plain">text/plain</option>
+					<option value="application/json">application/json</option>
+				</select>
+				<br /><br />
+				<label for="fragmentData">Enter fragment data: </label>
+				<input placeholder="(i.e ## Data)" id="fragmentData" name="fragmentData" required> </input>
+				<br /><br />
+				<button class="btn btn-outline-success" type="submit ">Post Fragment</button>
+			</form>
+		</section>
 
-	<body>
-		<div class="container">
 
-			<div >
-				<h1>Fragments UI</h1>
-				<button id="login">Login</button>
-				<button id="logout">Logout</button>
+		<section class="fragmentListSection">
+			<div class="title">
+				<h2>List of Fragment Metadata</h2>
 			</div>
 
+			<div class="fragments-card-section">
+				<div id="metadataCard">
 
-			<section hidden id="user">
-				<h2>Hello <span class="username"></span>!</h2>
-			</section>
+				</div>
+			</div>
+		</section>
 
-			<hr>
+	</div>
+	</div>
+</body>
 
-
-			<section id="fragments-form-section" >
-				<h3>Create a new fragment</h3>
-
-				<form id="fragmentForm">
-					<!-- ######################################################## -->
-					<label> Select Content-Type: </label>
-					<div class="content-type-btns">
-						<button type="button" class="text" id="text/plain">text/plain</button>
-						<button type="button" id="text/html">text/html</button>
-						<button type="button" id="text/markdown">text/markdown</button>
-						<button type="button" id="application/json">application/json</button>
-					</div>
-					<div class="selected-content" hidden>
-						<br/>
-						<p >=> Selected Type: 
-							<span style="color: #34da58" id="selected-type-span"></span>
-						</p>
-					</div>
-					<!-- ######################################################## -->
-					<hr>
-					<!-- ######################################################## -->
-					<label> Select what to convert to: </label>
-					<div class="convert-to-btns">
-						<button type="button" id="txt" >text/plain</button>
-						<button type="button" id="html" >text/html</button>
-						<button type="button" id="md">text/markdown</button>
-						<button type="button" id="json">application/json</button>
-					</div>
-					<div class="selected-convert-to" hidden>
-						<br/>
-						<p >=> Converting to:
-							<span style="color: #34da58" id="convert-to-span"></span>
-						</p>
-					</div>
-
-					<!-- ######################################################## -->
-
-					<br>
-					<label for="title">Enter data: </label>
-
-					<textarea name="textFragment" id="textFragment" cols="30" rows="5"></textarea>
-					<button type="submit" id="postFragmentBtn">Create</button>
-					
-					<br><br>
-					
-					<label >List of fragments: </label>
-					<ol class="fragmentList">
-
-					</ol>
- 				</form>
-			</section>	
-		</div>
-	</body>
 </html>
-
