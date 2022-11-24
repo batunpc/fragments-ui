@@ -54,7 +54,7 @@ async function init() {
     await postFragment(user, fragmentType, fragmentData);
     createFragmentCard();
     fragmentInput.value = "";
-    console.log("Fragment created");
+    console.log(`Posted fragment of type ${fragmentType}`);
   });
 
   // // CONVERT: Convert Form and Fragment ID
@@ -107,11 +107,44 @@ async function init() {
            font-size: 17px;`
         );
 
-        const formattedDate = new Date(fragment.created).toLocaleString();
+        const formattedDate = new Date(fragment.created).toLocaleString(
+          "en-US",
+          {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+          }
+        );
+
         fragmentDiv.innerHTML = `<span> Fragment ID:</span> <i> ${fragment.id} </i> <br>
-                                <span> Content-Type:</span> ${fragment.type}   <br>
+                                <span> Content-Type:</span> <i>${fragment.type}</i> <br>
                                 <span> Fragment Size:</span> ${fragment.size}  <br>
                                 <span> Created:</span> ${formattedDate}  `;
+        // Delete button
+        const deleteBtn = document.createElement("button");
+        deleteBtn.setAttribute(
+          "style",
+          ` margin-top: 5px;
+            padding: 10px;
+            width: 30%;
+            overflow: scroll;
+            display: inline-block;
+            vertical-align: top;
+            text-align: center;
+            border-radius: 25px;
+            font-size: 15px;
+            float: right;`
+        );
+        deleteBtn.innerHTML = "Delete Fragment";
+        // TODO: Add delete functionality
+        // deleteBtn.addEventListener("click", () => {
+        //   deleteFragment(fragment.id);
+        //   createFragmentCard();
+        // });
+        fragmentDiv.appendChild(deleteBtn);
 
         fragmentDiv.querySelectorAll("span").forEach((span) => {
           span.setAttribute(
@@ -123,9 +156,10 @@ async function init() {
           i.setAttribute(
             "style",
             /* fragment id  */
-            "background-color: #5a5a5a; border: 1px solid #313131; color: #c7c7c7; padding: 3px; border-radius: 5px; color: #ECECEC;"
+            "background-color: #3C4048; color: #00ABB3; padding: 2px 5px; border-radius: 5px; font-weight: 500;"
           );
         });
+
         metadataCard?.appendChild(fragmentDiv);
       });
     });
