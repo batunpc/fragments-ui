@@ -1,6 +1,7 @@
 // src/app.js
 
-import { Auth, getUser } from "./auth";
+//import { Auth, getUser } from "./auth";
+import authHandler from "../utils/index";
 import {
   getFragmentById,
   getUserFragments,
@@ -8,34 +9,11 @@ import {
   deleteFragment,
 } from "./api";
 
-const authHandler = async () => {
-  const loginBtn = document.querySelector("#login");
-  const logoutBtn = document.querySelector("#logout");
-  const userSection = document.querySelector("#user");
-  const user = await getUser();
-  loginBtn
-    ? loginBtn.addEventListener("click", () => Auth.federatedSignIn())
-    : null;
-  logoutBtn ? logoutBtn.addEventListener("click", () => Auth.signOut()) : null;
-  if (!user) {
-    logoutBtn?.setAttribute("disabled", "true");
-    return;
-  }
-  console.log({ user });
-  userSection?.attributes.removeNamedItem("hidden");
-  loginBtn?.setAttribute("disabled", "true");
-  userSection
-    ?.querySelector(".username")
-    ?.appendChild(document.createTextNode(user?.username));
-  loginBtn?.classList.add("hidden");
-  // Do an authenticated request to the fragments API server and log the result
-
-  return user;
-};
-
 async function init() {
   const user = await authHandler(); // User info
-  createFragmentCard();
+
+  if (user) createFragmentCard();
+
   // Form where fragment is created
   const createFragmentForm = document.getElementById("create-fragment-form");
 
@@ -56,9 +34,11 @@ async function init() {
     const fragmentType = fragmentTypeDropdown.value;
     const fragmentData = fragmentInput.value.trim();
 
-    await postFragment(user, fragmentType, fragmentData);
+    const fragment = await postFragment(user, fragmentType, fragmentData);
+
     createFragmentCard();
     fragmentInput.value = "";
+    console.log("Fragment created", { fragment });
     console.log(`Posted fragment of type ${fragmentType}`);
   });
 
@@ -128,39 +108,34 @@ async function init() {
                                 <span> Content-Type:</span> <i>${fragment.type}</i> <br>
                                 <span> Fragment Size:</span> ${fragment.size}  <br>
                                 <span> Created:</span> ${formattedDate}  `;
-        // Delete button
+        // == Delete button == //
         const deleteBtn = document.createElement("button");
-        deleteBtn.setAttribute(
-          "style",
-          ` margin-top: 5px;
-            padding: 10px;
-            width: 30%;
-            overflow: scroll;
-            display: inline-block;
-            vertical-align: top;
-            text-align: center;
-            border-radius: 25px;
-            font-size: 15px;
-            float: right;`
-        );
+        deleteBtn.setAttribute("class", "btn btn-outline-danger btn-sm");
+        deleteBtn.setAttribute("style", "float: right;");
         deleteBtn.innerHTML = "Delete Fragment";
-        // TODO: Add delete functionality
         deleteBtn.addEventListener("click", async () => {
           await deleteFragment(user, fragment.id);
           createFragmentCard();
         });
         fragmentDiv.appendChild(deleteBtn);
 
+        // == Get Data button == //
+        const getDataBtn = document.createElement("button");
+        getDataBtn.setAttribute("class", "btn btn-outline-primary btn-sm");
+        getDataBtn.setAttribute("style", "float: right; margin-right: 10px;");
+        getDataBtn.innerHTML = "Get Data";
+        fragmentDiv.appendChild(getDataBtn);
+
         fragmentDiv.querySelectorAll("span").forEach((span) => {
           span.setAttribute(
             "style",
-            " color: #3F72AF; font-weight: 700; font-family: 'Courier New', Courier, monospace;"
+            ` color: #3F72AF; font-weight: 700; font-family: 'Courier New', Courier, monospace;`
           );
         });
         fragmentDiv.querySelectorAll("i").forEach((i) => {
           i.setAttribute(
             "style",
-            /* fragment id  */
+            // fragment id and content-type
             "background-color: #3C4048; color: #00ABB3; padding: 2px 5px; border-radius: 5px; font-weight: 500;"
           );
         });
