@@ -1,7 +1,12 @@
 // src/app.js
 
 import { Auth, getUser } from "./auth";
-import { getFragmentById, getUserFragments, postFragment } from "./api";
+import {
+  getFragmentById,
+  getUserFragments,
+  postFragment,
+  deleteFragment,
+} from "./api";
 
 const authHandler = async () => {
   const loginBtn = document.querySelector("#login");
@@ -140,10 +145,10 @@ async function init() {
         );
         deleteBtn.innerHTML = "Delete Fragment";
         // TODO: Add delete functionality
-        // deleteBtn.addEventListener("click", () => {
-        //   deleteFragment(fragment.id);
-        //   createFragmentCard();
-        // });
+        deleteBtn.addEventListener("click", async () => {
+          await deleteFragment(user, fragment.id);
+          createFragmentCard();
+        });
         fragmentDiv.appendChild(deleteBtn);
 
         fragmentDiv.querySelectorAll("span").forEach((span) => {
