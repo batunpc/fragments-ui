@@ -74,7 +74,8 @@ async function init() {
         "#metadataCard"
       ) as HTMLElement;
       metadataCard.innerHTML = "";
-      data?.fragments.data.forEach((fragment: any) => {
+      console.log("data", data?.fragments.fragments);
+      data?.fragments.fragments.forEach((fragment: any) => {
         const fragmentDiv = document.createElement("div");
         fragmentDiv.setAttribute(
           "style",
@@ -140,13 +141,24 @@ async function init() {
               vertical-align: top;
               text-align: left;
               border-radius: 20px;
-              border: 5px solid #103664;
+              border: 3px solid #103664;
               font-size: 17px;`
           );
-          fragmentDataDiv.innerHTML = `<span> Fragment Data:</span> <i> ${fragmentData} </i> <br>`;
+
+          fragmentDataDiv.innerHTML = `<span> Fragment Data:</span> ${fragmentData}<br>`;
           fragmentDiv.appendChild(fragmentDataDiv);
+
+          //if get data button is clicked again, remove the fragment data div
+          if (fragmentDiv.contains(fragmentDataDiv)) {
+            getDataBtn.addEventListener("click", () => {
+              fragmentDiv.removeChild(fragmentDataDiv);
+            });
+          }
         });
+
         fragmentDiv.appendChild(getDataBtn);
+
+        metadataCard.appendChild(fragmentDiv);
 
         fragmentDiv.querySelectorAll("span").forEach((span) => {
           span.setAttribute(
