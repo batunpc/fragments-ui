@@ -1,7 +1,7 @@
 // src/app.js
 
-//import { Auth, getUser } from "./auth";
 import authHandler from "../utils/index";
+
 import {
   getFragmentById,
   getUserFragments,
@@ -110,7 +110,7 @@ async function init() {
                                 <span> Created:</span> ${formattedDate}  `;
         // == Delete button == //
         const deleteBtn = document.createElement("button");
-        deleteBtn.setAttribute("class", "btn btn-outline-danger btn-sm");
+        deleteBtn.setAttribute("class", "btn btn-danger btn-sm");
         deleteBtn.setAttribute("style", "float: right;");
         deleteBtn.innerHTML = "Delete Fragment";
         deleteBtn.addEventListener("click", async () => {
@@ -121,9 +121,31 @@ async function init() {
 
         // == Get Data button == //
         const getDataBtn = document.createElement("button");
-        getDataBtn.setAttribute("class", "btn btn-outline-primary btn-sm");
+        getDataBtn.setAttribute("class", "btn btn-dark btn-sm");
         getDataBtn.setAttribute("style", "float: right; margin-right: 10px;");
         getDataBtn.innerHTML = "Get Data";
+        getDataBtn.addEventListener("click", async () => {
+          const fragmentData = await getFragmentById(user, fragment.id);
+          //console.log("Fragment Data", fragmentData);
+          const fragmentDataDiv = document.createElement("div");
+          fragmentDataDiv.setAttribute(
+            "style",
+            `color: #233142;
+              background-color: #DBE2EF;
+              margin: 10px;
+              padding: 10px;
+              width: 90%;
+              overflow: scroll;
+              display: inline-block;
+              vertical-align: top;
+              text-align: left;
+              border-radius: 20px;
+              border: 5px solid #103664;
+              font-size: 17px;`
+          );
+          fragmentDataDiv.innerHTML = `<span> Fragment Data:</span> <i> ${fragmentData} </i> <br>`;
+          fragmentDiv.appendChild(fragmentDataDiv);
+        });
         fragmentDiv.appendChild(getDataBtn);
 
         fragmentDiv.querySelectorAll("span").forEach((span) => {
@@ -132,6 +154,7 @@ async function init() {
             ` color: #3F72AF; font-weight: 700; font-family: 'Courier New', Courier, monospace;`
           );
         });
+
         fragmentDiv.querySelectorAll("i").forEach((i) => {
           i.setAttribute(
             "style",
