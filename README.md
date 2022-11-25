@@ -1,6 +1,6 @@
 # Fragments UI
 
-> Simple but functional web app to test the back-end cloud-based microservice
+> Simple but functional web app to test back-end fragments microservice and manage authentication with AWS User Pool
 
 
 ## Instructions on running the app
