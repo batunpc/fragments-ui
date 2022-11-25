@@ -66,7 +66,8 @@ export async function getFragmentById(
         throw new Error(`Unknown content type: ${contentType}`);
     }
   } catch (err) {
-    console.error(`Unable to call GET /v1/fragments/${id}`, { err });
+    console.error("Unable to call GET /v1/fragments/:id", { err });
+    return null;
   }
 }
 /*= GET BY ID =  */
