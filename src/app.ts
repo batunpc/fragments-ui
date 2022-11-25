@@ -125,7 +125,7 @@ async function init() {
           // add label for fragmentTypeDropdown
           const fragmentTypeLabel = document.createElement("label");
           fragmentTypeLabel.setAttribute("for", "fragment-type-dropdown");
-          fragmentTypeLabel.innerHTML = "Select type to convert: ";
+          fragmentTypeLabel.innerHTML = "Select type to convert : ";
           fragmentDataDiv.appendChild(fragmentTypeLabel);
           // add dropdown menu to select fragment type
           const fragmentTypeDropdown = document.createElement("select");
