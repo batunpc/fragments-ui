@@ -125,34 +125,35 @@ async function init() {
         getDataBtn.setAttribute("class", "btn btn-dark btn-sm");
         getDataBtn.setAttribute("style", "float: right; margin-right: 10px;");
         getDataBtn.innerHTML = "Get Data";
+        const fragmentDataDiv = document.createElement("div");
+        fragmentDataDiv.setAttribute(
+          "style",
+          `color: #233142;
+            background-color: #DBE2EF;
+            margin: 10px;
+            padding: 10px;
+            width: 90%;
+            overflow: scroll;
+            display: inline-block;
+            vertical-align: top;
+            text-align: left;
+            border-radius: 20px;
+            border: 3px solid #103664;
+            font-size: 17px;
+            display: none;`
+        );
+
         getDataBtn.addEventListener("click", async () => {
           const fragmentData = await getFragmentById(user, fragment.id);
           //console.log("Fragment Data", fragmentData);
-          const fragmentDataDiv = document.createElement("div");
-          fragmentDataDiv.setAttribute(
-            "style",
-            `color: #233142;
-              background-color: #DBE2EF;
-              margin: 10px;
-              padding: 10px;
-              width: 90%;
-              overflow: scroll;
-              display: inline-block;
-              vertical-align: top;
-              text-align: left;
-              border-radius: 20px;
-              border: 3px solid #103664;
-              font-size: 17px;`
-          );
-
           fragmentDataDiv.innerHTML = `<span> Fragment Data:</span> ${fragmentData}<br>`;
-          fragmentDiv.appendChild(fragmentDataDiv);
 
-          //if get data button is clicked again, remove the fragment data div
-          if (fragmentDiv.contains(fragmentDataDiv)) {
-            getDataBtn.addEventListener("click", () => {
-              fragmentDiv.removeChild(fragmentDataDiv);
-            });
+          fragmentDiv.appendChild(fragmentDataDiv);
+          // toggle get data button to hide and show fragment data div on each click of button
+          if (fragmentDataDiv.style.display === "none") {
+            fragmentDataDiv.style.display = "block";
+          } else {
+            fragmentDataDiv.style.display = "none";
           }
         });
 
