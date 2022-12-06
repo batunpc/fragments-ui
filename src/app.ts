@@ -15,6 +15,9 @@ import {
 } from "./api";
 
 async function init() {
+  // spinner for loading indicator
+  const spinner = document.querySelector(".spin") as HTMLDivElement;
+
   const user = await authHandler(); // User info
 
   if (user) createFragmentCard();
@@ -65,7 +68,7 @@ async function init() {
     acceptedFileTypes: ["text/*", "application/json", "image/*"],
   });
 
-  let fileDropBox: any;
+  let fileDropBox: any = "";
   // listen for addfile event
   pond.on("addfile", (error, file) => {
     if (error) {
@@ -90,9 +93,11 @@ async function init() {
   /* === upload file button === */
   submitFileButton?.addEventListener("click", async (e) => {
     e.preventDefault();
+    spinner.removeAttribute("hidden");
     // if file is not uploaded yet focus on the filepond
     if (!fileDropBox) {
-      input.focus();
+      // click on the filepond
+      input.click();
       return;
     }
     const fragmentType = fileDropBox.fileType;
@@ -102,6 +107,9 @@ async function init() {
       const fragmentData = fileReader.result;
       const fragment = await postFragment(user, fragmentType, fragmentData);
       createFragmentCard();
+      window.location.reload(); // this is to prevent user from posting the same file again
+      spinner.setAttribute("hidden", "true");
+
       console.log("Fragment created", { fragment });
       console.log(`Posted fragment of type ${fragmentType}`);
     };
@@ -147,7 +155,18 @@ async function init() {
            `
         );
 
-        const formattedDate = new Date(fragment.created).toLocaleString(
+        const formattedDateCreated = new Date(fragment.created).toLocaleString(
+          "en-US",
+          {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+          }
+        );
+        const formattedDateUpdated = new Date(fragment.updated).toLocaleString(
           "en-US",
           {
             month: "long",
@@ -162,7 +181,8 @@ async function init() {
         fragmentDiv.innerHTML = `<span> Fragment ID:</span> <i> ${fragment.id} </i> <br>
                                 <span> Content-Type:</span> <i>${fragment.type}</i> <br>
                                 <span> Fragment Size:</span> ${fragment.size}  <br>
-                                <span> Created:</span> ${formattedDate}  `;
+                                <span> Created:</span> ${formattedDateCreated} <br> 
+                                <span> Updated:</span> ${formattedDateUpdated} <br>`;
         // == Delete button == //
         const deleteBtn = document.createElement("button");
         deleteBtn.setAttribute("class", "btn btn-danger btn-sm");
@@ -198,9 +218,25 @@ async function init() {
         );
 
         getDataBtn.addEventListener("click", async () => {
-          const fragmentData = await getFragmentById(user, fragment.id);
-          //console.log("Fragment Data", fragmentData);
-          fragmentDataDiv.innerHTML = `<span> Fragment Data:</span> ${fragmentData}<br>`;
+          const fragmentData = (await getFragmentById(
+            user,
+            fragment.id
+          )) as any;
+          // check if the fragment data is an image
+          if (fragment?.type.includes("image")) {
+            // turn fragmentData into an image
+            fragmentDataDiv.innerHTML = `<img src="${fragmentData}" alt="fragment image" style="width: 100%; height: 100%;">`;
+          } else if (fragment?.type.includes("json")) {
+            console.log(fragmentData.fragment);
+            fragmentDataDiv.innerHTML = ` ${JSON.stringify(
+              fragmentData.fragment,
+              null,
+              2
+            )}`;
+          } else {
+            //console.log("Fragment Data", fragmentData);
+            fragmentDataDiv.innerHTML = `<span> Fragment Data:</span> ${fragmentData}<br>`;
+          }
           // add label for fragmentTypeDropdown
           const fragmentTypeLabel = document.createElement("label");
           fragmentTypeLabel.setAttribute("for", "fragment-type-dropdown");
@@ -224,7 +260,7 @@ async function init() {
           convertBtn.setAttribute("class", "btn btn-info btn-sm");
           convertBtn.setAttribute("style", "float: right; margin-right: 10px;");
           convertBtn.innerHTML = "Convert Fragment";
-          convertBtn.addEventListener("click", async () => {
+          convertBtn.addEventListener("click", () => {
             const fragmentType = fragmentTypeDropdown.value;
             console.log("Fragment Type", fragmentType);
 

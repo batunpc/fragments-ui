@@ -62,6 +62,23 @@ export async function getFragmentById(
         return await res.text();
       case "application/json":
         return { fragment: await res.json() };
+      case "image/png":
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        console.log("png URL ", url);
+        return url;
+      case "image/jpeg":
+        const blob2 = await res.blob();
+        const url2 = URL.createObjectURL(blob2);
+        return url2;
+      case "image/gif":
+        const blob3 = await res.blob();
+        const url3 = URL.createObjectURL(blob3);
+        return url3;
+      case "image/webp":
+        const blob4 = await res.blob();
+        const url4 = URL.createObjectURL(blob4);
+        return url4;
 
       default:
         throw new Error(`Unknown content type: ${contentType}`);
@@ -98,7 +115,7 @@ export async function postFragment(user: any, contentType: string, value: any) {
       body: value,
     });
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-    return { fragments: await res.json() };
+    //return { fragments: await res.json() };
   } catch (err: Error | any) {
     console.error("Unable to call POST /v1/fragment", { err: err.message });
     throw new Error("Unable to call POST /v1/fragment");
