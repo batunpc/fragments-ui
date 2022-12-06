@@ -18,7 +18,7 @@ interface Fragment {
 }
 
 export async function getUserFragments(user: any, expand?: boolean) {
-  console.log("API => Requesting fragments data...");
+  console.log(`API => Requesting fragments data... from ${apiUrl}`);
   try {
     let url = `${apiUrl}/v1/fragments`;
     if (expand) url += "?expand=1";
@@ -45,6 +45,7 @@ export async function getFragmentById(
   ext: string = ""
 ) {
   try {
+    console.log(`URL : ${apiUrl}/v1/fragments/${id}${ext}`);
     const res = await fetch(`${apiUrl}/v1/fragments/${id}${ext}`, {
       headers: user.authorizationHeaders(),
     });

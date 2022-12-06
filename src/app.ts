@@ -1,6 +1,11 @@
 // src/app.js
 
 import authHandler from "../utils/index";
+import { create, registerPlugin } from "filepond";
+import "filepond/dist/filepond.css";
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+// preview
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 
 import {
   getFragmentById,
@@ -27,7 +32,14 @@ async function init() {
     "fragmentData"
   ) as HTMLInputElement;
 
-  // == POST == //
+  // Button to create fragment manually
+  const postFragmentManualButton = document.getElementById(
+    "post-fragment-manual-btn"
+  ) as HTMLButtonElement;
+
+  const submitFileButton = document.getElementById("submit-file-btn");
+
+  // == POST == // manually post fragment
   createFragmentForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -40,6 +52,66 @@ async function init() {
     fragmentInput.value = "";
     console.log("Fragment created", { fragment });
     console.log(`Posted fragment of type ${fragmentType}`);
+  });
+
+  /* ======== DROPBOX POST (using FilePond) ========  */
+  const input = document.querySelector(
+    'input[type="file"]'
+  ) as HTMLInputElement;
+
+  registerPlugin(FilePondPluginFileValidateType, FilePondPluginImagePreview);
+
+  const pond = create(input, {
+    acceptedFileTypes: ["text/*", "application/json", "image/*"],
+  });
+
+  let fileDropBox: any;
+  // listen for addfile event
+  pond.on("addfile", (error, file) => {
+    if (error) {
+      console.log(`Error posting the file: ${error}`);
+      return;
+    }
+    console.table(
+      `File added with content type ${file.fileType}, and size ${file.fileSize}`
+    );
+
+    // set the content type of the file to the fragment type dropdown menu
+    fragmentTypeDropdown.value = file.fileType;
+    // disable input and dropdown menu
+    fragmentInput.disabled = true;
+    fragmentTypeDropdown.disabled = true;
+    postFragmentManualButton.disabled = true;
+
+    console.log(`From dropdown => ${fragmentTypeDropdown.value}`, file);
+    fileDropBox = file;
+  });
+
+  /* === upload file button === */
+  submitFileButton?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const fragmentType = fileDropBox.fileType;
+    const fileReader = new FileReader();
+    fileReader.readAsText(fileDropBox.file);
+    fileReader.onload = async () => {
+      const fragmentData = fileReader.result;
+      const fragment = await postFragment(user, fragmentType, fragmentData);
+      createFragmentCard();
+      console.log("Fragment created", { fragment });
+      console.log(`Posted fragment of type ${fragmentType}`);
+    };
+    fileReader.onerror = (error) => {
+      console.log(`Error reading the file: ${error}`);
+    };
+
+    // reset the filepond
+    pond.removeFiles();
+    // enable input and dropdown menu
+    fragmentInput.disabled = false;
+    fragmentTypeDropdown.disabled = false;
+    postFragmentManualButton.disabled = false;
+
+    console.log("File to be posted", fileDropBox);
   });
 
   function createFragmentCard() {
@@ -65,7 +137,9 @@ async function init() {
            text-align: left; 
            border-radius: 20px; 
            border: 5px solid #103664; 
-           font-size: 17px;`
+           font-size: 17px;
+            transition: all 0.3s ease-in-out;
+           `
         );
 
         const formattedDate = new Date(fragment.created).toLocaleString(

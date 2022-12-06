@@ -1,124 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Fragments UI</title>
+    <link
+      href="https://unpkg.com/filepond@^4/dist/filepond.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="https://unpkg.com/bamboo.css" />
+  </head>
+  <style>
+    #app {
+      margin: 0 auto;
+      width: 100%;
+    }
 
-<head>
-	<meta charset="utf-8" />
-	<title>Fragments UI</title>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
-		integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous" />
-	<link rel="stylesheet" href="https://unpkg.com/bamboo.css" />
-	<script type="module" src="./app.ts"></script>
-</head>
-<style>
-	#app {
-		margin: 0 auto;
+    .postFragmentSection {
+      margin: 0 auto;
+      width: 100%;
+      border-radius: 1.5rem;
+    }
 
-		/* responsive */
-		width: 100%;
+    .fragmentListSection {
+      margin: 25px auto;
+      overflow: scroll;
+      width: 100%;
+      height: 500px;
+      background-color: #292e39;
+      border-radius: 1.5rem;
+      padding: 1rem;
+      text-align: center;
+    }
 
-	}
+    .title {
+      background-color: #292e39;
+      border-radius: 1.5rem 1.5rem 0 0;
+      text-align: center;
+      margin: 0 auto;
+    }
 
-	.postFragmentSection {
-		margin: 0 auto;
-		width: 100%;
+    #metadataCard .container {
+      color: #000000;
+      background-color: #ffffff;
+      margin: 10px;
+      padding: 10px;
+      width: 70%;
+      overflow: scroll;
+      display: inline-block;
+      vertical-align: top;
+      text-align: left;
+      border-radius: 20px;
+    }
 
+    #metadataCard .container > span {
+      display: block;
+      color: darkcyan;
+      font-size: small;
+    }
 
-		border-radius: 1.5rem;
+    #line-with-or {
+      text-align: center;
+      background-color: #3c4048;
+      border-radius: 1.5rem;
+      width: 7%;
+      margin: 0 auto;
+      margin-bottom: 20px;
+    }
 
-	}
+    #spanOr {
+      display: inline-block;
+      padding: 0 5px;
+      font-size: larger;
+      color: #00abb3;
+    }
+  </style>
 
-	.fragmentListSection {
-		margin: 25px auto;
-		overflow: scroll;
-		width: 100%;
-		height: 500px;
-		background-color: #292E39;
-		border-radius: 1.5rem;
-		padding: 1rem;
-		text-align: center;
-	}
+  <body>
+    <div id="app">
+      <h1>Fragments UI</h1>
+      <section>
+        <nav>
+          <button class="btn btn-primary" id="login">Login</button>
+          <button class="btn btn-primary" id="logout">Logout</button>
+        </nav>
+      </section>
+      <section hidden id="user">
+        <h2>Hello <span class="username"></span>!</h2>
+      </section>
 
-	.title {
-		background-color: #292E39;
-		border-radius: 1.5rem 1.5rem 0 0;
+      <hr />
+      <section class="postFragmentSection">
+        <h3>Create fragment</h3>
+        <form id="create-fragment-form" action="/" method="post">
+          <!-- dropdown -->
+          <label for="create-fragment-type">Select Content-Type: </label>
+          <select id="fragment-type-dropdown">
+            <option value="text/markdown">text/markdown</option>
+            <option value="text/html">text/html</option>
+            <option value="text/plain">text/plain</option>
+            <option value="application/json">application/json</option>
+          </select>
+          <br /><br />
+          <label for="fragmentData">Enter fragment data: </label>
+          <input
+            placeholder="(i.e ## Data)"
+            id="fragmentData"
+            name="fragmentData"
+            required
+          />
+          <br /><br />
+          <button
+            id="post-fragment-manual-btn"
+            class="btn btn-outline-success"
+            type="submit "
+          >
+            Post Fragment
+          </button>
+        </form>
+      </section>
 
-		text-align: center;
-		margin: 0 auto;
-	}
+      <p id="line-with-or">
+        <span id="spanOr"> or </span>
+      </p>
 
+      <!-- DROPBOX AREA for uploading files-->
 
+      <input type="file" name="filepond" required />
+      <button
+        id="submit-file-btn"
+        class="btn btn-outline-primary"
+        type="submit "
+      >
+        Upload File
+      </button>
 
-	#metadataCard .container {
-		color: #000000;
-		background-color: #ffffff;
-		margin: 10px;
-		padding: 10px;
-		width: 70%;
-		overflow: scroll;
-		display: inline-block;
-		vertical-align: top;
-		text-align: left;
-		border-radius: 20px;
-	}
+      <section class="fragmentListSection">
+        <div class="title">
+          <h2>List of Fragment Metadata</h2>
+        </div>
 
-	#metadataCard .container>span {
-		display: block;
-		color: darkcyan;
-		font-size: small;
-	}
+        <div class="fragments-card-section">
+          <div id="metadataCard"></div>
+        </div>
+      </section>
+    </div>
 
-</style>
-
-<body>
-	<div id="app">
-		<h1>Fragments UI</h1>
-		<section>
-			<nav>
-				<button class="btn btn-outline-primary" id="login">Login</button> 
-				<button class="btn btn-outline-primary"
-					id="logout">Logout</button>
-			</nav>
-		</section>
-		<section hidden id="user">
-			<h2>Hello <span class="username"></span>!</h2>
-		</section>
-
-
-		<hr />
-		<section class="postFragmentSection">
-			<h3>Create fragment</h3>
-			<form id="create-fragment-form">
-				<!-- dropdown -->
-				<label for="create-fragment-type">Select Content-Type: </label>
-				<select id="fragment-type-dropdown">
-					<option value="text/markdown">text/markdown</option>
-					<option value="text/html">text/html</option>
-					<option value="text/plain">text/plain</option>
-					<option value="application/json">application/json</option>
-				</select>
-				<br /><br />
-				<label for="fragmentData">Enter fragment data: </label>
-				<input placeholder="(i.e ## Data)" id="fragmentData" name="fragmentData" required> </input>
-				<br /><br />
-				<button class="btn btn-outline-success" type="submit ">Post Fragment</button>
-			</form>
-		</section>
-
-
-		<section class="fragmentListSection">
-			<div class="title">
-				<h2>List of Fragment Metadata</h2>
-			</div>
-
-			<div class="fragments-card-section">
-				<div id="metadataCard">
-
-				</div>
-			</div>
-		</section>
-
-	</div>
-	</div>
-</body>
-
+    <script type="module" src="./app.ts"></script>
+    <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
+  </body>
 </html>
