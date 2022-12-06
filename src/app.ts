@@ -90,6 +90,11 @@ async function init() {
   /* === upload file button === */
   submitFileButton?.addEventListener("click", async (e) => {
     e.preventDefault();
+    // if file is not uploaded yet focus on the filepond
+    if (!fileDropBox) {
+      input.focus();
+      return;
+    }
     const fragmentType = fileDropBox.fileType;
     const fileReader = new FileReader();
     fileReader.readAsText(fileDropBox.file);
