@@ -6,12 +6,14 @@ import "filepond/dist/filepond.css";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 // preview
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import * as FilePond from "filepond";
 
 import {
   getFragmentById,
   getUserFragments,
   postFragment,
   deleteFragment,
+  updateFragment,
 } from "./api";
 
 async function init() {
@@ -40,7 +42,6 @@ async function init() {
     "post-fragment-manual-btn"
   ) as HTMLButtonElement;
 
-  const submitFileButton = document.getElementById("submit-file-btn");
   const createFragmentWithFileForm = document.getElementById(
     "create-fragment-with-file-form"
   ) as HTMLFormElement;
@@ -208,8 +209,214 @@ async function init() {
         });
         fragmentDiv.appendChild(deleteBtn);
 
-        // == View Fragment button == //
         const getDataBtn = document.createElement("button");
+
+        // == Update button == //
+        const updateBtn = document.createElement("button");
+        updateBtn.setAttribute("class", "btn btn-primary btn-sm");
+        updateBtn.setAttribute("style", "float: right; margin-right: 10px;");
+        updateBtn.innerHTML = "Update Fragment";
+        const fragmentUpdateDiv = document.createElement("div");
+        fragmentUpdateDiv.setAttribute(
+          "style",
+          ` margin: 50px 10px 10px 10px;
+            padding: 10px;
+            width: 95%;
+            overflow: scroll;
+            display: inline-block;
+            vertical-align: top;
+            text-align: left;
+            border-radius: 20px;
+            border: 5px solid #103664;
+            font-size: 17px;
+            display: none;
+            `
+        );
+
+        updateBtn.addEventListener("click", async () => {
+          // disable the view button
+          getDataBtn.disabled = true;
+          const fragmentData = (await getFragmentById(
+            user,
+            fragment.id
+          )) as any;
+          // make it toggle like view button below
+
+          // if it is not an image, then it is a text so provide a text area
+          // FOR NON-IMAGE FRAGMENTS UPDATES ONLY
+          if (!fragment.type.includes("image")) {
+            const textArea = document.createElement("textarea");
+            textArea.setAttribute("id", "fragmentInput");
+            textArea.setAttribute("rows", "5");
+            textArea.setAttribute("cols", "50");
+            textArea.setAttribute(
+              "style",
+              `width: 100%;
+            resize: none;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 12px 20px;
+            box-sizing: border-box;
+            display: inline-block;
+            line-height: 20px;
+            `
+            );
+            textArea.innerHTML = fragmentData;
+
+            fragmentUpdateDiv.innerHTML = "";
+            fragmentUpdateDiv.appendChild(textArea);
+
+            // create a save button
+            const saveBtn = document.createElement("button");
+            saveBtn.setAttribute("class", "btn btn-success btn-sm");
+            saveBtn.setAttribute(
+              "style",
+              "width: 70%; margin: 0 auto; text-align: center; display: block; justify-content: center;"
+            );
+            saveBtn.innerHTML = "Save updated fragment";
+            saveBtn.addEventListener("click", async () => {
+              const updatedFragmentData = document.querySelector(
+                "#fragmentInput"
+              ) as HTMLTextAreaElement;
+              await updateFragment(
+                user,
+                fragment.id,
+                updatedFragmentData.value,
+                fragment.type
+              );
+              createFragmentCard();
+            });
+
+            fragmentUpdateDiv.appendChild(saveBtn);
+          }
+          if (fragment.type.includes("image")) {
+            // FOR IMAGE FRAGMENTS UPDATES ONLY
+            const image = document.createElement("img");
+            image.setAttribute("src", fragmentData);
+            image.setAttribute("width", "100%");
+            image.setAttribute("height", "auto");
+            image.setAttribute("style", "margin: 0 auto; display: block;");
+
+            fragmentUpdateDiv.innerHTML = "";
+            fragmentUpdateDiv.appendChild(image);
+
+            // make an input for the image and use it for filepond
+            // add label for the filepond input
+            const label = document.createElement("label");
+            label.setAttribute("for", "fragmentInput");
+            label.innerHTML =
+              "Select a new image to upload (Upload jpg, png, gif, or webp)";
+            label.setAttribute(
+              "style",
+              `width: 100%; margin: 0 auto; display: block;
+              font-size: 17px;
+              margin: 10px; 0px 2px 0px;`
+            );
+            // another label as note for the user right below the other label
+            const noteLabel = document.createElement("label");
+            noteLabel.setAttribute("for", "fragmentInput");
+            noteLabel.innerHTML =
+              "Note: The content type must be as the same as the original one";
+            noteLabel.setAttribute(
+              "style",
+              `width: 100%; margin: 0 auto; display: block;
+              padding: 2px;
+              background-color: #3C4048;
+              color: #00ABB3;
+              border-radius: 5px;
+              text-align: center;
+              margin-bottom: 10px;
+              `
+            );
+            fragmentUpdateDiv.appendChild(label);
+            fragmentUpdateDiv.appendChild(noteLabel);
+
+            const imageInput = document.createElement("input");
+            imageInput.setAttribute("type", "file");
+            imageInput.setAttribute("id", "fragmentInput");
+            imageInput.setAttribute("accept", "image/*");
+            imageInput.setAttribute(
+              "style",
+              "width: 100%; margin: 0 auto; display: block;"
+            );
+
+            fragmentUpdateDiv.appendChild(imageInput);
+
+            const pond = FilePond.create(imageInput, {
+              allowMultiple: false,
+              acceptedFileTypes: ["image/*"],
+            });
+            let fileDropBox: any = "";
+            pond.on("addfile", (error, file) => {
+              if (error) {
+                console.log(`Error posting the file: ${error}`);
+                return;
+              }
+              console.table(
+                `File added with content type ${file.fileType}, and size ${file.fileSize}`
+              );
+
+              fileDropBox = file;
+            });
+
+            // create a save button
+            const saveBtn = document.createElement("button");
+            saveBtn.setAttribute("class", "btn btn-success btn-sm");
+            saveBtn.setAttribute(
+              "style",
+              "width: 70%; margin: 0 auto; text-align: center; display: block; justify-content: center;"
+            );
+            saveBtn.innerHTML = "Save updated fragment";
+
+            saveBtn.addEventListener("click", async (e) => {
+              e.preventDefault();
+              if (!fileDropBox) {
+                // click on the filepond
+                input.click();
+                return;
+              }
+              const fileReader = new FileReader();
+              fileReader.readAsArrayBuffer(fileDropBox.file);
+
+              fileReader.onload = async () => {
+                const fragmentType = fileDropBox.fileType;
+                // if the file is an image, the data is a base64 string
+                const fragmentData = fileReader.result;
+
+                console.log(`Fragment type: ${fragmentType}`);
+                console.log(`Fragment data: ${fileReader.result}`);
+
+                await updateFragment(
+                  user,
+                  fragment.id,
+                  fragmentData,
+                  fragmentType
+                );
+                window.location.reload();
+
+                // and click on the view fragment button
+                getDataBtn.click();
+                console.log(`Posted fragment of type ${fragmentType}`);
+              };
+              fileReader.onerror = (error) => {
+                console.log(`Error reading the file: ${error}`);
+              };
+            });
+
+            fragmentUpdateDiv.appendChild(saveBtn);
+          }
+
+          fragmentDiv.appendChild(fragmentUpdateDiv);
+
+          if (fragmentUpdateDiv.style.display === "none") {
+            fragmentUpdateDiv.style.display = "block";
+          } else {
+            fragmentUpdateDiv.style.display = "none";
+            getDataBtn.disabled = false;
+          }
+        });
+
+        // == View Fragment button == //
         getDataBtn.setAttribute("class", "btn btn-dark btn-sm");
         getDataBtn.setAttribute("style", "float: right; margin-right: 10px;");
         getDataBtn.innerHTML = "View Fragment ";
@@ -313,15 +520,11 @@ async function init() {
               console.log("Fragment image Type ", fragmentType);
               getFragmentById(user, fragment.id, fragmentType).then((data) => {
                 console.log("Converted Fragment", data);
-                fragmentDataDiv.innerHTML = `Converted to ${fragmentType}: ${data}`;
-                fragmentDataDiv.innerHTML = fragmentDataDiv.innerHTML.replace(
-                  /</g,
-                  "&lt;"
-                );
-                fragmentDataDiv.innerHTML = fragmentDataDiv.innerHTML.replace(
-                  />/g,
-                  "&gt;"
-                );
+                //fragmentDataDiv.innerHTML = `Converted to ${fragmentType}: ${data}`;
+                fragmentDataDiv.innerHTML = `<img src="${data}"
+                alt="fragment image"
+                style="width: 100%; height: 80%; border-radius: 20px;
+                border: 3px solid #103664;">`;
               });
             } else {
               const fragmentType = fragmentTypeDropdown.value;
@@ -351,13 +554,18 @@ async function init() {
           if (fragmentDataDiv.style.display === "none") {
             fragmentDataDiv.style.display = "block";
             getDataBtn.innerHTML = "Hide Fragment";
+            // disable update button
+            updateBtn.disabled = true;
           } else {
             fragmentDataDiv.style.display = "none";
             getDataBtn.innerHTML = "View Fragment ";
+            // enable update button
+            updateBtn.disabled = false;
           }
         });
 
         fragmentDiv.appendChild(getDataBtn);
+        fragmentDiv.appendChild(updateBtn);
 
         metadataCard.appendChild(fragmentDiv);
 

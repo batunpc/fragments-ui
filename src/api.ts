@@ -140,3 +140,26 @@ export async function deleteFragment(user: any, id: Fragment) {
     console.error("Unable to call DELETE /v1/fragment", { err });
   }
 }
+
+export async function updateFragment(
+  user: any,
+  id: Fragment,
+  fragment: any,
+  contentType: string
+) {
+  try {
+    const res = await fetch(`${apiUrl}/v1/fragments/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": contentType,
+        Authorization: user.authorizationHeaders().Authorization,
+      },
+      body: fragment,
+    });
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    console.log("Updated fragment data", { fragments: await res.json() });
+  } catch (err: Error | any) {
+    console.error("Unable to call PUT /v1/fragment", { err: err.message });
+    throw new Error("Unable to call PUT /v1/fragment");
+  }
+}
