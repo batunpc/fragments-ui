@@ -41,6 +41,9 @@ async function init() {
   ) as HTMLButtonElement;
 
   const submitFileButton = document.getElementById("submit-file-btn");
+  const createFragmentWithFileForm = document.getElementById(
+    "create-fragment-with-file-form"
+  ) as HTMLFormElement;
 
   // == POST == // manually post fragment
   createFragmentForm?.addEventListener("submit", async (e) => {
@@ -49,11 +52,11 @@ async function init() {
     const fragmentType = fragmentTypeDropdown.value;
     const fragmentData = fragmentInput.value.trim();
 
-    const fragment = await postFragment(user, fragmentType, fragmentData);
+    await postFragment(user, fragmentType, fragmentData);
 
     createFragmentCard();
     fragmentInput.value = "";
-    console.log("Fragment created", { fragment });
+
     console.log(`Posted fragment of type ${fragmentType}`);
   });
 
@@ -90,8 +93,7 @@ async function init() {
     fileDropBox = file;
   });
 
-  /* === upload file button === */
-  submitFileButton?.addEventListener("click", async (e) => {
+  createFragmentWithFileForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     spinner.removeAttribute("hidden");
     // if file is not uploaded yet focus on the filepond
@@ -100,17 +102,29 @@ async function init() {
       input.click();
       return;
     }
-    const fragmentType = fileDropBox.fileType;
+    // read the file and check if it is a image or text
     const fileReader = new FileReader();
-    fileReader.readAsText(fileDropBox.file);
+
+    if (fileDropBox.fileType.includes("image")) {
+      fileReader.readAsArrayBuffer(fileDropBox.file);
+    } else {
+      fileReader.readAsText(fileDropBox.file);
+    }
+
     fileReader.onload = async () => {
+      const fragmentType = fileDropBox.fileType;
+      // if the file is an image, the data is a base64 string
       const fragmentData = fileReader.result;
-      const fragment = await postFragment(user, fragmentType, fragmentData);
+
+      console.log(`Fragment type: ${fragmentType}`);
+      console.log(`Fragment data: ${fileReader.result}`);
+
+      await postFragment(user, fragmentType, fragmentData);
+
       createFragmentCard();
-      window.location.reload(); // this is to prevent user from posting the same file again
+      //window.location.reload(); // this is to prevent user from posting the same file again
       spinner.setAttribute("hidden", "true");
 
-      console.log("Fragment created", { fragment });
       console.log(`Posted fragment of type ${fragmentType}`);
     };
     fileReader.onerror = (error) => {
@@ -204,7 +218,7 @@ async function init() {
           "style",
           `color: #233142;
             background-color: #DBE2EF;
-            margin: 10px;
+            margin: 50px 20px;
             padding: 10px;
             width: 90%;
             overflow: scroll;
@@ -224,8 +238,10 @@ async function init() {
           )) as any;
           // check if the fragment data is an image
           if (fragment?.type.includes("image")) {
-            // turn fragmentData into an image
-            fragmentDataDiv.innerHTML = `<img src="${fragmentData}" alt="fragment image" style="width: 100%; height: 100%;">`;
+            fragmentDataDiv.innerHTML = `<img src="${fragmentData}"
+            alt="fragment image"
+            style="width: 100%; height: 80%; border-radius: 20px;
+            border: 3px solid #103664;">`;
           } else if (fragment?.type.includes("json")) {
             console.log(fragmentData.fragment);
             fragmentDataDiv.innerHTML = ` ${JSON.stringify(
@@ -240,8 +256,7 @@ async function init() {
           // add label for fragmentTypeDropdown
           const fragmentTypeLabel = document.createElement("label");
           fragmentTypeLabel.setAttribute("for", "fragment-type-dropdown");
-          fragmentTypeLabel.innerHTML = "Select type to convert : ";
-          fragmentDataDiv.appendChild(fragmentTypeLabel);
+          fragmentTypeLabel.innerHTML = "Select type to convert: ";
           // add dropdown menu to select fragment type
           const fragmentTypeDropdown = document.createElement("select");
           fragmentTypeDropdown.setAttribute("id", "fragment-type-dropdown");
@@ -253,7 +268,38 @@ async function init() {
                                             <option value=".html">text/html</option>
                                             <option value=".md">text/markdown</option>
                                             <option value=".js">application/json</option>`;
-          fragmentDataDiv.appendChild(fragmentTypeDropdown);
+          //fragmentDataDiv.appendChild(fragmentTypeDropdown);
+          // append fragmentTypeDropdown to fragmentDataDiv only if fragment type is not image/*
+          if (!fragment?.type.includes("image")) {
+            fragmentDataDiv.appendChild(fragmentTypeDropdown);
+            fragmentDataDiv.appendChild(fragmentTypeLabel);
+          }
+          // make another dropdown menu to select fragment type for images only if fragment type is image/*
+          const fragmentTypeDropdownForImage = document.createElement("select");
+          if (fragment?.type.includes("image")) {
+            const fragmentTypeLabelForImage = document.createElement("label");
+            fragmentTypeLabelForImage.setAttribute(
+              "for",
+              "fragment-type-dropdown"
+            );
+            fragmentTypeLabelForImage.innerHTML =
+              "Select Image type to convert : ";
+            fragmentDataDiv.appendChild(fragmentTypeLabelForImage);
+
+            fragmentTypeDropdownForImage.setAttribute(
+              "id",
+              "fragment-type-dropdown"
+            );
+            fragmentTypeDropdownForImage.setAttribute(
+              "style",
+              "margin: 5px 10px; padding: 10px; width: 90%;"
+            );
+            fragmentTypeDropdownForImage.innerHTML = `<option value=".png">image/png</option>
+                                                      <option value=".jpg">image/jpeg</option>
+                                                      <option value=".gif">image/gif</option>
+                                                      <option value=".webp">image/webp</option>`;
+            fragmentDataDiv.appendChild(fragmentTypeDropdownForImage);
+          }
 
           // ADD CONVERT BUTTON
           const convertBtn = document.createElement("button");
@@ -261,24 +307,42 @@ async function init() {
           convertBtn.setAttribute("style", "float: right; margin-right: 10px;");
           convertBtn.innerHTML = "Convert Fragment";
           convertBtn.addEventListener("click", () => {
-            const fragmentType = fragmentTypeDropdown.value;
-            console.log("Fragment Type", fragmentType);
+            // check if fragment type is image/* and convert to selected image type
+            if (fragment?.type.includes("image")) {
+              const fragmentType = fragmentTypeDropdownForImage.value;
+              console.log("Fragment image Type ", fragmentType);
+              getFragmentById(user, fragment.id, fragmentType).then((data) => {
+                console.log("Converted Fragment", data);
+                fragmentDataDiv.innerHTML = `Converted to ${fragmentType}: ${data}`;
+                fragmentDataDiv.innerHTML = fragmentDataDiv.innerHTML.replace(
+                  /</g,
+                  "&lt;"
+                );
+                fragmentDataDiv.innerHTML = fragmentDataDiv.innerHTML.replace(
+                  />/g,
+                  "&gt;"
+                );
+              });
+            } else {
+              const fragmentType = fragmentTypeDropdown.value;
+              console.log("Fragment Type", fragmentType);
 
-            getFragmentById(user, fragment.id, fragmentType).then((data) => {
-              console.log("Converted Fragment", data);
-              fragmentDataDiv.innerHTML = `Converted to ${fragmentType}: ${data}`;
-              fragmentDataDiv.innerHTML = fragmentDataDiv.innerHTML.replace(
-                /</g,
-                "&lt;"
-              );
-              fragmentDataDiv.innerHTML = fragmentDataDiv.innerHTML.replace(
-                />/g,
-                "&gt;"
-              );
-              if (!data) {
-                fragmentDataDiv.innerHTML = "415: Unsupported Media Type";
-              }
-            });
+              getFragmentById(user, fragment.id, fragmentType).then((data) => {
+                console.log("Converted Fragment", data);
+                fragmentDataDiv.innerHTML = `Converted to ${fragmentType}: ${data}`;
+                fragmentDataDiv.innerHTML = fragmentDataDiv.innerHTML.replace(
+                  /</g,
+                  "&lt;"
+                );
+                fragmentDataDiv.innerHTML = fragmentDataDiv.innerHTML.replace(
+                  />/g,
+                  "&gt;"
+                );
+                if (!data) {
+                  fragmentDataDiv.innerHTML = "415: Unsupported Media Type";
+                }
+              });
+            }
           });
           fragmentDataDiv.appendChild(convertBtn);
 

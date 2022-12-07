@@ -65,7 +65,6 @@ export async function getFragmentById(
       case "image/png":
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
-        console.log("png URL ", url);
         return url;
       case "image/jpeg":
         const blob2 = await res.blob();
@@ -115,6 +114,7 @@ export async function postFragment(user: any, contentType: string, value: any) {
       body: value,
     });
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    console.log("Posted fragment data", { fragments: await res.json() });
     //return { fragments: await res.json() };
   } catch (err: Error | any) {
     console.error("Unable to call POST /v1/fragment", { err: err.message });

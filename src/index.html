@@ -161,14 +161,21 @@
 
       <!-- DROPBOX AREA for uploading files-->
 
-      <input type="file" name="filepond" required />
-      <button
-        id="submit-file-btn"
-        class="btn btn-outline-primary"
-        type="submit "
+      <form
+        id="create-fragment-with-file-form"
+        action="/"
+        method="post"
+        enctype="multipart/form-data"
       >
-        Upload File
-      </button>
+        <input type="file" name="filepond" required />
+        <button
+          id="submit-file-btn"
+          class="btn btn-outline-primary"
+          type="submit "
+        >
+          Upload File
+        </button>
+      </form>
 
       <section class="fragmentListSection">
         <div class="spin" hidden></div>
