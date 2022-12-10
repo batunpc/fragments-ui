@@ -19,6 +19,13 @@
       href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+      integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
   </head>
   <style>
     #app {
@@ -113,20 +120,41 @@
 
   <body>
     <div id="app">
-      <h1>Fragments UI</h1>
-      <section>
-        <nav>
-          <button class="btn btn-primary" id="login">Login</button>
-          <button class="btn btn-primary" id="logout">Logout</button>
-        </nav>
-      </section>
-      <section hidden id="user">
-        <h2>Hello <span class="username"></span>!</h2>
-      </section>
+      <!-- <h1>Fragments UI</h1> -->
+      <!-- center the title -->
+      <div class="title">
+        <h1 style="padding: 7px">Fragments UI</h1>
+      </div>
+
+      <div class="d-flex justify-content-between" style="margin: 10px 0px">
+        <section hidden id="user">
+          <h2>Hello 🎉 <span class="username"></span>!</h2>
+        </section>
+        <section id="auth-buttons" style="margin-top: 30px">
+          <nav>
+            <button
+              class="btn btn-primary"
+              id="login"
+              style="margin-right: 5px"
+            >
+              <i class="fa-solid fa-right-to-bracket"></i>
+              Login
+            </button>
+            <button class="btn btn-primary" id="logout">
+              <i class="fa-solid fa-right-from-bracket"></i>
+              Logout
+            </button>
+          </nav>
+        </section>
+        <!-- make two sections auth-buttons and user to be in same line -->
+      </div>
 
       <hr />
       <section class="postFragmentSection">
-        <h3>Create fragment</h3>
+        <h3>
+          Create fragment
+          <i class="fa-solid fa-puzzle-piece"></i>
+        </h3>
         <form id="create-fragment-form" action="/" method="post">
           <!-- dropdown -->
           <label for="create-fragment-type">Select Content-Type: </label>
@@ -151,6 +179,7 @@
             type="submit "
           >
             Post Fragment
+            <i class="fa-regular fa-comment"></i>
           </button>
         </form>
       </section>
@@ -167,20 +196,30 @@
         method="post"
         enctype="multipart/form-data"
       >
-        <input type="file" name="filepond" required />
+        <input
+          type="file"
+          name="filepond"
+          accept="image/png, image/jpeg, image/webp, image/gif"
+          required
+        />
         <button
           id="submit-file-btn"
           class="btn btn-outline-primary"
           type="submit "
+          style="margin-bottom: 10px"
         >
           Upload File
+          <i class="fa-regular fa-file"></i>
         </button>
       </form>
 
       <section class="fragmentListSection">
         <div class="spin" hidden></div>
         <div class="title">
-          <h2>List of Fragment Metadata</h2>
+          <h2>
+            <i class="fa-solid fa-rectangle-list"></i>
+            List of Fragment Metadata
+          </h2>
         </div>
 
         <div class="fragments-card-section">

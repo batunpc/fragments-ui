@@ -4,8 +4,13 @@ import authHandler from "../utils/index";
 import { create, registerPlugin } from "filepond";
 import "filepond/dist/filepond.css";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
-// preview
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
+import FilePondPluginImageCrop from "filepond-plugin-image-crop";
+import FilePondPluginImageResize from "filepond-plugin-image-resize";
+import FilePondPluginImageTransform from "filepond-plugin-image-transform";
+import FilePondPluginImageEdit from "filepond-plugin-image-edit";
+
 import * as FilePond from "filepond";
 
 import {
@@ -66,7 +71,15 @@ async function init() {
     'input[type="file"]'
   ) as HTMLInputElement;
 
-  registerPlugin(FilePondPluginFileValidateType, FilePondPluginImagePreview);
+  registerPlugin(
+    FilePondPluginFileValidateType,
+    FilePondPluginImageExifOrientation,
+    FilePondPluginImagePreview,
+    FilePondPluginImageCrop,
+    FilePondPluginImageResize,
+    FilePondPluginImageTransform,
+    FilePondPluginImageEdit
+  );
 
   const pond = create(input, {
     acceptedFileTypes: ["text/*", "application/json", "image/*"],
