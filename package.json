@@ -1,6 +1,6 @@
 {
   "name": "fragments-ui",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Fragments UI testing web app",
   "scripts": {
     "start": "(npx parcel ./src/index.html) && (npx parcel watch ./src/index.html)",
