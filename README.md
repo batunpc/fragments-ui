@@ -18,16 +18,4 @@ Fragments UI has a Dockerfile that uses 3 stages (dependency, build and producti
 
 ## Images
 
-After creating fragment of type `text/markdown` you can view the metadata.
-
-<img width="450" alt="CleanShot 2022-11-24 at 23 52 20@2x" src="https://user-images.githubusercontent.com/71259399/203903798-c0bcb996-4cbc-4581-8fa4-33f628c53af7.png">
-
-Viewing the `data` that has been entered to create this fragment metadata.
-
-<img width="500" alt="CleanShot 2022-11-24 at 23 53 29@2x" src="https://user-images.githubusercontent.com/71259399/203904056-724f9edf-db87-4382-aef4-aec940faf26b.png">
-
-You can view fragment data in different content types. In this case we are viewing in `text/html`
-
-<img width="500" alt="CleanShot 2022-11-24 at 23 58 34@2x" src="https://user-images.githubusercontent.com/71259399/203904508-dcc2be38-94b7-40f3-b9f4-641de7b32c0d.png">
-
-
+<img width="908" alt="CleanShot 2022-12-10 at 18 04 52@2x" src="https://user-images.githubusercontent.com/71259399/206878662-5405b332-5bd5-4d42-aa39-5ffda0a78fdb.png">
