@@ -230,13 +230,16 @@ async function init() {
             image.setAttribute("src", data);
             image.setAttribute(
               "style",
-              `width: 120px; height: 110px; position: absolute; top: 10px; right: 15px; border-radius: 20px; 
-              border: 5px solid #103664; overflow: hidden;
-
-              box-shadow: 0 0 7px #103664, 0 0 40px #103664, 0 0 50px #103664;
-
+              `width: 125px; height: 115px; position: absolute; top: 10px; right: 15px; border-radius: 20px; 
+              border: 5px solid #222222; overflow: hidden;
+              box-shadow: 0 0 4px #222222, 0 0 40px #222222, 0 0 60px #222222;
+              cursor: pointer;
               `
             );
+            // if image clicked, click on the getDataBtn
+            image.addEventListener("click", () => {
+              getDataBtn.click();
+            });
             fragmentDiv.appendChild(image);
           });
         } else {
@@ -289,7 +292,6 @@ async function init() {
             user,
             fragment.id
           )) as any;
-          // make it toggle like view button below
 
           // if it is not an image, then it is a text so provide a text area
           // FOR NON-IMAGE FRAGMENTS UPDATES ONLY
@@ -349,8 +351,6 @@ async function init() {
             fragmentUpdateDiv.innerHTML = "";
             fragmentUpdateDiv.appendChild(image);
 
-            // make an input for the image and use it for filepond
-            // add label for the filepond input
             const label = document.createElement("label");
             label.setAttribute("for", "fragmentInput");
             label.innerHTML =
@@ -524,13 +524,11 @@ async function init() {
                                             <option value=".html">text/html</option>
                                             <option value=".md">text/markdown</option>
                                             <option value=".js">application/json</option>`;
-          //fragmentDataDiv.appendChild(fragmentTypeDropdown);
-          // append fragmentTypeDropdown to fragmentDataDiv only if fragment type is not image/*
+
           if (!fragment?.type.includes("image")) {
             fragmentDataDiv.appendChild(fragmentTypeDropdown);
             fragmentDataDiv.appendChild(fragmentTypeLabel);
           }
-          // make another dropdown menu to select fragment type for images only if fragment type is image/*
           const fragmentTypeDropdownForImage = document.createElement("select");
           if (fragment?.type.includes("image")) {
             const fragmentTypeLabelForImage = document.createElement("label");
@@ -563,7 +561,6 @@ async function init() {
           convertBtn.setAttribute("style", "float: right; margin-right: 10px;");
           convertBtn.innerHTML = "Convert Fragment";
           convertBtn.addEventListener("click", () => {
-            // check if fragment type is image/* and convert to selected image type
             if (fragment?.type.includes("image")) {
               const fragmentType = fragmentTypeDropdownForImage.value;
               console.log("Fragment image Type ", fragmentType);
