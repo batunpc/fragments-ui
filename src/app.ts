@@ -248,6 +248,32 @@ async function init() {
           <span> Fragment Size:</span> ${fragment.size}  <br>
           <span> Created:</span> ${formattedDateCreated} <br> 
           <span> Updated:</span> ${formattedDateUpdated} <br>`;
+
+          // create a div element and just show a file icon for non-image files using font awesome
+          //  create div
+          const fileIconDiv = document.createElement("div");
+          fileIconDiv.setAttribute(
+            "style",
+            ` position: absolute; top: 10px; right: 15px; border-radius: 10px;
+            border: 1px solid #222222; overflow: hidden;
+
+            cursor: pointer;
+
+            `
+          );
+          // create icon
+          const fileIcon = document.createElement("i");
+          fileIcon.setAttribute("class", "fas fa-file fa-5x");
+          fileIcon.setAttribute(
+            "style",
+            `color: #222222; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);`
+          );
+          fileIconDiv.appendChild(fileIcon);
+          // if file icon clicked, click on the getDataBtn
+          fileIconDiv.addEventListener("click", () => {
+            getDataBtn.click();
+          });
+          fragmentDiv.appendChild(fileIconDiv);
         }
 
         // == Delete button == //
