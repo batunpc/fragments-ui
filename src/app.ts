@@ -85,16 +85,13 @@ async function init() {
     acceptedFileTypes: ["text/*", "application/json", "image/*"],
   });
 
-  let fileDropBox: any = "";
+  let isDraggedFile: any = "";
   // listen for addfile event
   pond.on("addfile", (error, file) => {
     if (error) {
       console.log(`Error posting the file: ${error}`);
       return;
     }
-    console.table(
-      `File added with content type ${file.fileType}, and size ${file.fileSize}`
-    );
 
     // set the content type of the file to the fragment type dropdown menu
     fragmentTypeDropdown.value = file.fileType;
@@ -104,14 +101,14 @@ async function init() {
     postFragmentManualButton.disabled = true;
 
     console.log(`From dropdown => ${fragmentTypeDropdown.value}`, file);
-    fileDropBox = file;
+    isDraggedFile = file;
   });
 
   createFragmentWithFileForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     spinner.removeAttribute("hidden");
     // if file is not uploaded yet focus on the filepond
-    if (!fileDropBox) {
+    if (!isDraggedFile) {
       // click on the filepond
       input.click();
       return;
@@ -119,20 +116,21 @@ async function init() {
     // read the file and check if it is a image or text
     const fileReader = new FileReader();
 
-    if (fileDropBox.fileType.includes("image")) {
-      fileReader.readAsArrayBuffer(fileDropBox.file);
+    if (isDraggedFile.fileType.includes("image")) {
+      fileReader.readAsArrayBuffer(isDraggedFile.file);
     } else {
-      fileReader.readAsText(fileDropBox.file);
+      fileReader.readAsText(isDraggedFile.file);
     }
 
     fileReader.onload = async () => {
-      const fragmentType = fileDropBox.fileType;
+      const fragmentType = isDraggedFile.fileType;
       // if the file is an image, the data is a base64 string
       const fragmentData = fileReader.result;
 
       console.log(`Fragment type: ${fragmentType}`);
       console.log(`Fragment data: ${fileReader.result}`);
-
+      // log the size of the file
+      console.log(`Uploaded fragment size is: ${isDraggedFile.file.size}`);
       await postFragment(user, fragmentType, fragmentData);
 
       createFragmentCard();
@@ -152,10 +150,10 @@ async function init() {
     fragmentTypeDropdown.disabled = false;
     postFragmentManualButton.disabled = false;
 
-    console.log("File to be posted", fileDropBox);
+    console.log("File to be posted", isDraggedFile);
   });
 
-  function createFragmentCard() {
+  async function createFragmentCard() {
     const listOfFragments = getUserFragments(user, true);
     listOfFragments.then((data) => {
       const metadataCard = document.querySelector(
@@ -164,6 +162,7 @@ async function init() {
       metadataCard.innerHTML = "";
       console.log("current metadata: ", data?.fragments.fragments);
       data?.fragments.fragments.forEach((fragment: any) => {
+        // do get by id
         const fragmentDiv = document.createElement("div");
         fragmentDiv.setAttribute(
           "style",
@@ -180,6 +179,7 @@ async function init() {
            border: 5px solid #103664; 
            font-size: 17px;
             transition: all 0.3s ease-in-out;
+            position: relative;
            `
         );
 
@@ -206,11 +206,47 @@ async function init() {
           }
         );
 
-        fragmentDiv.innerHTML = `<span> Fragment ID:</span> <i> ${fragment.id} </i> <br>
-                                <span> Content-Type:</span> <i>${fragment.type}</i> <br>
-                                <span> Fragment Size:</span> ${fragment.size}  <br>
-                                <span> Created:</span> ${formattedDateCreated} <br> 
-                                <span> Updated:</span> ${formattedDateUpdated} <br>`;
+        // check if image
+        if (fragment.type.includes("image")) {
+          // convert the size which is in bytes to megabytes
+          const fragmentSize = (fragment.size / 1000000).toFixed(2);
+          fragmentDiv.innerHTML = `<span> Fragment ID:</span> <i> ${fragment.id} </i> <br>
+          <span> Content-Type:</span> <i>${fragment.type}</i> <br>
+          <span> Fragment Size:</span> ${fragmentSize} MB  <br>
+          <span> Created:</span> ${formattedDateCreated} <br> 
+          <span> Updated:</span> ${formattedDateUpdated} <br>`;
+
+          async function getImageData() {
+            const fragmentData = (await getFragmentById(
+              user,
+              fragment.id
+            )) as any;
+            return fragmentData;
+          }
+          const image = document.createElement("img");
+          const imageData = getImageData();
+          imageData.then((data) => {
+            console.log("UUUUUUUU UU U U UU: ", data);
+            image.setAttribute("src", data);
+            image.setAttribute(
+              "style",
+              `width: 120px; height: 110px; position: absolute; top: 10px; right: 15px; border-radius: 20px; 
+              border: 5px solid #103664; overflow: hidden;
+
+              box-shadow: 0 0 7px #103664, 0 0 40px #103664, 0 0 50px #103664;
+
+              `
+            );
+            fragmentDiv.appendChild(image);
+          });
+        } else {
+          fragmentDiv.innerHTML = `<span> Fragment ID:</span> <i> ${fragment.id} </i> <br>
+          <span> Content-Type:</span> <i>${fragment.type}</i> <br>
+          <span> Fragment Size:</span> ${fragment.size}  <br>
+          <span> Created:</span> ${formattedDateCreated} <br> 
+          <span> Updated:</span> ${formattedDateUpdated} <br>`;
+        }
+
         // == Delete button == //
         const deleteBtn = document.createElement("button");
         deleteBtn.setAttribute("class", "btn btn-danger btn-sm");
@@ -359,7 +395,7 @@ async function init() {
               allowMultiple: false,
               acceptedFileTypes: ["image/*"],
             });
-            let fileDropBox: any = "";
+            let isDraggedFile: any = "";
             pond.on("addfile", (error, file) => {
               if (error) {
                 console.log(`Error posting the file: ${error}`);
@@ -369,7 +405,7 @@ async function init() {
                 `File added with content type ${file.fileType}, and size ${file.fileSize}`
               );
 
-              fileDropBox = file;
+              isDraggedFile = file;
             });
 
             // create a save button
@@ -383,16 +419,16 @@ async function init() {
 
             saveBtn.addEventListener("click", async (e) => {
               e.preventDefault();
-              if (!fileDropBox) {
+              if (!isDraggedFile) {
                 // click on the filepond
                 input.click();
                 return;
               }
               const fileReader = new FileReader();
-              fileReader.readAsArrayBuffer(fileDropBox.file);
+              fileReader.readAsArrayBuffer(isDraggedFile.file);
 
               fileReader.onload = async () => {
-                const fragmentType = fileDropBox.fileType;
+                const fragmentType = isDraggedFile.fileType;
                 // if the file is an image, the data is a base64 string
                 const fragmentData = fileReader.result;
 
